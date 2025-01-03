@@ -3,7 +3,6 @@ The goal of the app is to calculate the work schedule of a month for a clinic. T
 The application already has some requirements implemented that trys to implement:
 #Doctors are not allowed to do 2 consecutive shifts
 #Doctors are not allowed to do more than doctorMaxShiftPerMonth
-#The numebr of doctors scheduled in a day should be between doctorshiftMax and doctorshiftMin
 #Distance between two shifts must be maximized 
 #Doctors prefer to work less than 2 days per week 
 #Doctors should only be scheduled in the days that they want to work  
