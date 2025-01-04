@@ -26,9 +26,11 @@ class MonthlyClinicRequest:
         #Download data and save them as CSV
         self.downloadCSVFromServer('Input')
         self.downloadCSVFromServer('ExclusionList')
+        self.downloadCSVFromServer('ExperienceList')
         #Extract Input Data and Days that the doctors need to be excluded 
         self.inputCSVData = self.extractDataFromCSV('Input')
         self.exclCSVData = self.extractDataFromCSV('ExclusionList')
+        self.expCSVData = self.extractDataFromCSV('ExperienceList')
         #Extract information regarding the month 
         self.orderOfDays ,self.numberOfDays ,self.month = self.getDatesAndMonth(self.inputCSVData)
         self.weekendPositions = self.getWeekendPositions()
@@ -38,7 +40,20 @@ class MonthlyClinicRequest:
         #Extract information regarding shifts
         self.totalShifts = self.getTotalShifts(self.getNShifts(self.inputCSVData),self.getTShifts(self.inputCSVData))
         #Calculate Minimun and Maximum Shifts allowed 
-        self.minShifts, self.maxShifts = self.getMinMaxShifts(self.totalShifts)        
+        self.minShifts, self.maxShifts = self.getMinMaxShifts(self.totalShifts)    
+        #Create a dictionary where each doctor is noted as Experienced(1) or Not-Experienced(0)
+        self.doctorExperience = self.getDoctorExperience()
+
+
+    def getDoctorExperience(self):
+        """Retrieve a dictionary that describes doctors experience
+        Returnss
+        --------
+        doctorExperience: dict
+            A dictionary {'Name', 'Experience'}
+        """
+        doctorExperience = dict(self.expCSVData)
+        return doctorExperience            
 
     def downloadCSVFromServer(self, sheetName):
         """Download data from an online google spreadsheet with public access and save it to a CSV file
@@ -279,6 +294,7 @@ class MonthlyClinicRequest:
         print('Doctor Preference: ', self.doctorPreference)
         print('Total Shift Required/day: ', self.totalShifts)
         print('Max and Min Shifts: ', self.maxShifts, self.minShifts)
+        print('Doctor Experience: ',self.getDoctorExperience())
         
 
 

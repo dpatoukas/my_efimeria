@@ -7,6 +7,7 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 import os.path
 import csv
+import yaml
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -15,11 +16,14 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
 
+with open('config.yaml','r') as file:
+    CONFIG_FILE = yaml.safe_load(file)
+
 # If modifying these scopes, delete the file token.json.
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
 
 # The ID and range of a sample spreadsheet.
-SAMPLE_SPREADSHEET_ID = "1W7Zcz75bw3usVNZCfX0HAASmMuzExC-5DqDPedfjX3k"
+SAMPLE_SPREADSHEET_ID = CONFIG_FILE['ONLINE_SPREADSHEET_ID']
 VALUE_INPUT_OPTION  = 'USER_ENTERED'
 SPREADSHEET_OUTPUT_CELL = 'Output!A5'   
 
@@ -123,7 +127,7 @@ def main():
     # doctors.printScheduleInfo(randomSolution)
     #print(doctors.getDoctorWeekShifts(randomSolution))
 
-    ex = ExportSchedulingSolution(doctors.getDoctorWeekShifts(randomSolution))
+    ex = ExportSchedulingSolution(doctors.getDoctorWeekShifts(randomSolution),'1SZqqxaJqIZYGsJTP6JHi6RuvOaczO1ZnpCXGBb-pXsU')
     #print(ex.makeRow())
 
 

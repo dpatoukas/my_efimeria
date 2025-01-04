@@ -18,7 +18,7 @@ class DoctorSchedulingProblem:
     The class has methods to evaluate the cost of a given schedule
     The cost is calculated by adding the number of the cost of violations 
     """
-    def __init__(self, hardConstraintPenalty, listOfDoctors, listOfDoctorPreferce, doctorshiftMax, doctorshiftMin, weekendPositionArray):
+    def __init__(self, hardConstraintPenalty, listOfDoctors, listOfDoctorPreferce, doctorshiftMax, doctorshiftMin, weekendPositionArray, doctorExperience):
         """Constructor to the DoctorSchedulingProblem 
 
         Parameters
@@ -39,6 +39,7 @@ class DoctorSchedulingProblem:
         self.hardConstraintPenalty = hardConstraintPenalty
 
         self.doctors = listOfDoctors
+        self.doctorExperience = doctorExperience
         self.weekendPositionArray = weekendPositionArray
         self.doctorShiftPreference = listOfDoctorPreferce
         self.doctorshiftMax = doctorshiftMax
@@ -110,6 +111,19 @@ class DoctorSchedulingProblem:
 
         return doctorShiftsDict
     
+    def doctorExperieceViolation(self,doctorShiftDict):
+        """
+        Each day the number of experienced doctors must be bigger than the number of non-experienced doctors 
+        ----------
+        doctorShiftsDict: dict 
+            a dictionary with a separate schedule for each doctor                       
+        Returns
+        -------
+        count of violations found
+        """
+        for doctor,index in doctorShiftDict:
+            return 0
+        
         
     def doctorCountConsecutiveShiftViolations(self, doctorShiftsDict):
         """
@@ -381,12 +395,16 @@ def main():
     nr = MonthlyClinicRequest(SAMPLE_SPREADSHEET_ID)
 
     # create a problem instance:
-    doctors = DoctorSchedulingProblem(10000,nr.doctorNames,nr.doctorPreference,nr.totalShifts,nr.totalShifts,nr.weekendPositions)
+    doctors = DoctorSchedulingProblem(10000,nr.doctorNames,nr.doctorPreference,nr.totalShifts,nr.totalShifts,nr.weekendPositions,nr.doctorExperience)
 
     print()
     print("Solution")
     testSolution = formatSolutionData(readSolutionData())
+    print(testSolution)
+    print(len(testSolution))
     testSolution = np.array(testSolution)
+    rsz = np.reshape(testSolution, (17,30))
+    print(rsz)
     doctors.printScheduleInfo(testSolution)
 
     # solutionSize = len(doctors.doctors) * 30
