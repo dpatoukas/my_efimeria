@@ -1,17 +1,127 @@
-The goal of the app is to calculate the work schedule of a month for a clinic. The inputs needed are: the month name, the number of doctors available, and a preference list of days that the doctors prefer not to work. 
+# High-Level Architecture and Development Plan
 
-The application already has some requirements implemented that trys to implement:
-#Doctors are not allowed to do 2 consecutive shifts
-#Doctors are not allowed to do more than doctorMaxShiftPerMonth
-#Distance between two shifts must be maximized 
-#Doctors prefer to work less than 2 days per week 
-#Doctors should only be scheduled in the days that they want to work  
-#Doctors prefer to be working 2 or less weekends 
+## Overview
+This document outlines the high-level architecture and the structured development steps required to complete the Clinic Scheduling Application. The application calculates and manages monthly work schedules for doctors based on constraints and preferences.
 
-The output is a monthly schedule where one can see all the days they have to work. 
+---
 
+## High-Level Architecture
 
-An admin user should be able to fill in the month for which he would like to create a schedule. The number and the names of the available doctors. Then the admin should be able to mark on the days(maybe in a calendar input screen) that each doctor wants to have a day off. 
-The admin should click on a button that locks the input and waits for the application to finish. Once the application is finished they should see a screen where the admin can inspect the suggested schedule. If the admin agrees they should click agree and "print" the schedule. 
-If they would like a new calculation they should request a new schedule.
-If they would like to modify the shifts they should be able to manually edit the schedule before agreen on it and printing it. 
+### Backend Architecture
+- **Database Layer (SQLAlchemy with SQLite)**
+  - Handles data storage, migrations, and schema.
+  - Manages tables for Doctors, Schedules, and Shifts.
+
+- **Data Access Layer (DAO)**
+  - Provides CRUD operations to interact with the database.
+
+- **Repository Layer**
+  - Enforces business rules and applies validations for core entities.
+
+- **Service Layer**
+  - Implements complex scheduling algorithms and optimization rules.
+
+- **API/Controller Layer**
+  - Exposes REST endpoints to handle HTTP requests from the frontend.
+
+- **Authentication/Authorization**
+  - Ensures secure user access with JWT tokens.
+
+### Frontend Architecture
+- **Framework Options:**
+  - **React.js or Angular** for Client-Side Rendering (CSR).
+  - Flask/Django templates for Server-Side Rendering (SSR).
+- **UI Components:**
+  - Calendar view for scheduling.
+  - Forms for entering doctor preferences.
+  - Tables to display schedules.
+
+### External Libraries and Tools
+- **SQLAlchemy** - ORM for database interaction.
+- **Alembic** - Schema migrations.
+- **PyJWT** - Authentication.
+- **Pydantic** - Input validation.
+- **FullCalendar.js** - Frontend calendar view.
+- **Docker** - Containerization.
+- **Postman/Selenium** - API and end-to-end testing.
+
+---
+
+## Development Steps
+
+### Step 1: Database and Models
+- Design and define database schema.
+- Implement SQLAlchemy ORM models.
+- Create migrations with Alembic.
+- Test database initialization and data insertion.
+
+### Step 2: DAO and Repository Layers
+- Build DAOs for low-level data operations.
+- Create repositories to enforce business rules.
+- Test DAO and repository functionalities.
+
+### Step 3: Service Layer
+- Implement scheduling logic and constraints.
+- Optimize shift assignments using algorithms (e.g., genetic algorithms).
+- Add manual edit and recalculation features.
+- Test business logic with unit tests.
+
+### Step 4: API/Controller Layer
+- Define RESTful endpoints for CRUD operations.
+- Add endpoints for schedule generation, approval, and recalculation.
+- Document APIs with Swagger.
+- Test endpoints using Postman or automated tools.
+
+### Step 5: Authentication and Authorization
+- Add JWT-based authentication.
+- Implement role-based access control for admin users.
+- Protect endpoints requiring authentication.
+
+### Step 6: Frontend Development
+- Design and implement the user interface.
+- Integrate the frontend with backend APIs.
+- Build features like calendar input, schedule preview, and manual edits.
+- Test UI interactions with Selenium.
+
+### Step 7: Testing and Validation
+- Perform unit tests for each layer.
+- Conduct integration tests for data flow between layers.
+- Simulate edge cases (e.g., 100+ doctors) for scalability.
+
+### Step 8: Deployment and Documentation
+- Containerize the application using Docker.
+- Test local deployment with Docker Compose.
+- Prepare deployment pipeline (e.g., GitHub Actions).
+- Write detailed deployment and user documentation.
+
+---
+
+## Key Constraints and Business Rules
+1. Doctors cannot have consecutive shifts.
+2. Doctors cannot exceed a set number of shifts per month.
+3. Shifts should maximize gaps between workdays.
+4. Preferences for specific off-days must be respected.
+5. Minimize weekend assignments to two or fewer.
+6. Manual edits must maintain constraint validation.
+
+---
+
+## Deliverables
+1. Fully functional backend with RESTful APIs.
+2. Interactive frontend UI for schedule management.
+3. Authentication and authorization system.
+4. Comprehensive tests (unit, integration, and UI).
+5. Deployment-ready Docker configuration.
+6. Documentation including API reference and user guide.
+
+---
+
+## Next Steps
+1. Finalize service layer logic and testing.
+2. Implement API layer and connect it with the frontend.
+3. Add authentication and role management.
+4. Focus on testing and deployment readiness.
+
+---
+
+This document will evolve as development progresses. Updates will reflect changes in design decisions, new requirements, or implementation adjustments. Let me know if clarifications or additions are needed!
