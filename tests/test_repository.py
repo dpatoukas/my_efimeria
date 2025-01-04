@@ -4,58 +4,81 @@ import os
 # Add project root to Python path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
+import pytest
+from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from database.database_setup import engine
+from database.models import Base, Doctor, Schedule, Shift
 from repositories.repository import DoctorRepository, ScheduleRepository, ShiftRepository
-from database.models import Doctor, Schedule
 
+# Database setup for testing
+db_url = "sqlite:///:memory:"
+engine = create_engine(db_url)
+TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-# Create session
-Session = sessionmaker(bind=engine)
-session = Session()
+@pytest.fixture(scope="function")
+def db_session():
+    # Create tables
+    Base.metadata.create_all(bind=engine)
+    session = TestingSessionLocal()
+
+    # Insert initial data
+    doctor1 = Doctor(name="Dr. Smith", days_off="['2025-01-01']")
+    doctor2 = Doctor(name="Dr. Jones", days_off="['2025-01-02']")
+    schedule = Schedule(month="January", year=2025, status="Draft")
+    session.add_all([doctor1, doctor2, schedule])
+    session.commit()
+
+    yield session
+
+    # Clean up database after test
+    session.close()
+    Base.metadata.drop_all(bind=engine)
 
 # Test DoctorRepository
-try:
-    print("\n--- Testing DoctorRepository ---")
+def test_add_doctor(db_session):
+    print("Testing adding a new doctor...")
+    doctor = DoctorRepository.add_doctor(db_session, "Dr. Taylor", "['2025-01-03']")
+    assert doctor.name == "Dr. Taylor"
+    print("Doctor added successfully: Dr. Taylor")
 
-    # Add Doctor
-    doctor = DoctorRepository.add_doctor(session, "Dr. Brown3", "2025-41-03,2025-01-04")
-    print(f"Added Doctor: {doctor.id}, {doctor.name}, Days Off: {doctor.days_off}")
+    print("Testing duplicate doctor addition...")
+    with pytest.raises(ValueError, match="Doctor with this name already exists"):
+        DoctorRepository.add_doctor(db_session, "Dr. Smith", "['2025-01-04']")
+    print("Duplicate doctor test passed.")
 
-    # Fetch Doctor with Shifts
-    result = DoctorRepository.get_doctor_with_shifts(session, doctor.id)
-    print(f"Doctor with Shifts: {result['doctor'].name}, Shifts: {result['shifts']}")
-
-except Exception as e:
-    print("DoctorRepository Test Error:", e)
-
+def test_get_doctor_with_shifts(db_session):
+    print("Testing fetching doctor details with shifts...")
+    doctor = DoctorRepository.get_doctor_with_shifts(db_session, 1)
+    assert doctor["doctor"].name == "Dr. Smith"
+    assert len(doctor["shifts"]) == 0
+    print("Doctor fetched successfully with no shifts assigned.")
 
 # Test ScheduleRepository
-try:
-    print("\n--- Testing ScheduleRepository ---")
+def test_add_schedule(db_session):
+    print("Testing adding a new schedule...")
+    schedule = ScheduleRepository.add_schedule(db_session, "February", 2025)
+    assert schedule.month == "February"
+    print("Schedule added successfully: February 2025")
 
-    # Add Schedule
-    schedule = ScheduleRepository.add_schedule(session, "January", 2025)
-    print(f"Added Schedule: {schedule.id}, {schedule.month}, {schedule.year}, Status: {schedule.status}")
+    print("Testing duplicate schedule addition...")
+    with pytest.raises(ValueError, match="Schedule for this month already exists"):
+        ScheduleRepository.add_schedule(db_session, "January", 2025)
+    print("Duplicate schedule test passed.")
 
-    # Finalize Schedule
-    finalized_schedule = ScheduleRepository.finalize_schedule(session, schedule.id)
-    print(f"Finalized Schedule: {finalized_schedule.id}, Status: {finalized_schedule.status}")
-
-except Exception as e:
-    print("ScheduleRepository Test Error:", e)
-
+def test_finalize_schedule(db_session):
+    print("Testing finalizing a schedule...")
+    schedule = ScheduleRepository.finalize_schedule(db_session, 1)
+    assert schedule.status == "Finalized"
+    print("Schedule finalized successfully.")
 
 # Test ShiftRepository
-try:
-    print("\n--- Testing ShiftRepository ---")
+def test_assign_shift(db_session):
+    print("Testing assigning a shift...")
+    shift = ShiftRepository.assign_shift(db_session, 1, 1, "2025-01-03")
+    assert shift.date == "2025-01-03"
+    print("Shift assigned successfully: 2025-01-03")
 
-    # Assign Shift
-    shift = ShiftRepository.assign_shift(session, schedule.id, doctor.id, "2025-01-06")
-    print(f"Assigned Shift: {shift.id}, Date: {shift.date}, Status: {shift.status}")
-
-except Exception as e:
-    print("ShiftRepository Test Error:", e)
-
-# Close session
-session.close()
+    print("Testing double booking prevention...")
+    with pytest.raises(ValueError, match="Doctor is already assigned a shift on this date"):
+        ShiftRepository.assign_shift(db_session, 1, 1, "2025-01-03")
+    print("Double booking prevention test passed.")

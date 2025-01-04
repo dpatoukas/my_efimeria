@@ -1,1 +1,43 @@
-/__pycache__
+# Database
+clinic_schedule.db
+*.db
+*.sqlite3
+*.sqlite
+*.db-journal
+
+# Migrations
+migrations/versions/*.pyc
+migrations/versions/*.pyo
+
+# Logs and debug
+*.log
+logs/
+
+# IDEs and Editors
+.vscode/
+.idea/
+
+# Virtual environment
+.env
+.env.*
+
+# Cache and compiled Python files
+__pycache__/
+.cache/
+*.py[cod]
+
+# Temporary files
+*.tmp
+*.bak
+
+# Git-related files
+*.orig
+*.rej
+*.un~
+
+# Documentation and ignore folder
+Documentation/
+ignore/
+
+# Alembic
+alembic.ini
