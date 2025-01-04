@@ -1,6 +1,12 @@
+import sys
+import os
+
+# Add project root to Python path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 from sqlalchemy.orm import Session
-from clinic_request import MonthlyClinicRequest
-from models import Doctor, Schedule, Shift
+from monthly_clinic_request import create_monthly_clinic_request
+from database.models import Doctor, Schedule, Shift
 from datetime import datetime
 import calendar
 
@@ -12,7 +18,7 @@ class DatabaseToClinicRequestService:
         """
         self.session = session
 
-    def get_monthly_clinic_request(self, month: str, year: int) -> MonthlyClinicRequest:
+    def get_monthly_clinic_request(self, month: str, year: int):
         """
         Fetches data from the database and transforms it into a MonthlyClinicRequest object.
 
@@ -21,7 +27,7 @@ class DatabaseToClinicRequestService:
         - year (int): The target year (e.g., 2024).
 
         Returns:
-        - MonthlyClinicRequest: An object populated with database data.
+        - dict: A dictionary representing the MonthlyClinicRequest object.
         """
         # Fetch Schedule
         schedule = self.session.query(Schedule).filter_by(month=month, year=year).first()
@@ -47,19 +53,19 @@ class DatabaseToClinicRequestService:
         # Transform into Preference Matrix
         doctor_preference = self._generate_preference_matrix(doctor_names, doctor_days_off, total_days)
 
-        # Create the MonthlyClinicRequest object
-        clinic_request = MonthlyClinicRequest(googleSheetId=None)  # Sheet ID not required
-        clinic_request.orderOfDays = order_of_days  # Names of the days
-        clinic_request.numberOfDays = number_of_days  # 1 to last day
-        clinic_request.month = month
-        clinic_request.weekendPositions = weekend_positions
-        clinic_request.doctorNames = doctor_names
-        clinic_request.doctorPreference = doctor_preference
-
-        # Constant Total Shifts, Max Shifts, and Min Shifts
-        clinic_request.totalShifts = [5] * len(total_days)
-        clinic_request.minShifts = [2] * len(total_days)
-        clinic_request.maxShifts = [4] * len(total_days)
+        # Create the MonthlyClinicRequest using the function
+        clinic_request = create_monthly_clinic_request(
+            googleSheetId=None,
+            month=month,
+            orderOfDays=order_of_days,
+            numberOfDays=number_of_days,
+            weekendPositions=weekend_positions,
+            doctorNames=doctor_names,
+            doctorPreference=doctor_preference,
+            totalShifts=[5] * len(total_days),
+            minShifts=[2] * len(total_days),
+            maxShifts=[4] * len(total_days)
+        )
 
         return clinic_request
 
@@ -112,8 +118,11 @@ class DatabaseToClinicRequestService:
         """
         preference_matrix = []
         for doctor in doctor_names:
+            print(f"\nDoctor: {doctor}")
             preference = []
             for day in total_days:
+                formatted_date = day.strftime("%Y-%m-%d")
+                print(f"Date: {formatted_date}, Days Off: {doctor_days_off.get(doctor)}, Match: {formatted_date in doctor_days_off.get(doctor, [])}")
                 if doctor == "NA":
                     preference.append("NA")  # Placeholder if no doctors
                 elif day.strftime("%Y-%m-%d") in doctor_days_off.get(doctor, []):
@@ -125,13 +134,13 @@ class DatabaseToClinicRequestService:
 
     def print_request_info(self, clinic_request):
         """
-        Prints all data from the MonthlyClinicRequest object.
+        Prints all data from the MonthlyClinicRequest dictionary.
         """
-        print(f"\nTarget Month: {clinic_request.month}")
-        print(f"Numbering of Days: {clinic_request.numberOfDays}")
-        print(f"Order of Days: {clinic_request.orderOfDays}")
-        print(f"Weekend Positions: {clinic_request.weekendPositions}")
-        print(f"Doctors Available: {clinic_request.doctorNames}")
-        print(f"Doctor Preferences: {clinic_request.doctorPreference}")
-        print(f"Total Shifts Required/Day: {clinic_request.totalShifts}")
-        print(f"Max and Min Shifts: {clinic_request.maxShifts}, {clinic_request.minShifts}")
+        print(f"\nTarget Month: {clinic_request['month']}")
+        print(f"Numbering of Days: {clinic_request['numberOfDays']}")
+        print(f"Order of Days: {clinic_request['orderOfDays']}")
+        print(f"Weekend Positions: {clinic_request['weekendPositions']}")
+        print(f"Doctors Available: {clinic_request['doctorNames']}")
+        print(f"Doctor Preferences: {clinic_request['doctorPreference']}")
+        print(f"Total Shifts Required/Day: {clinic_request['totalShifts']}")
+        print(f"Max and Min Shifts: {clinic_request['maxShifts']}, {clinic_request['minShifts']}")

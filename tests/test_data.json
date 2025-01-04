@@ -1,0 +1,23 @@
+{
+    "doctors": [
+      {"id": 1, "name": "Dr. Alice", "days_off": "2024-09-10,2024-09-15"},
+      {"id": 2, "name": "Dr. Bob", "days_off": "2024-09-05,2024-09-20"},
+      {"id": 3, "name": "Dr. Charlie", "days_off": "2024-09-12,2024-09-22"},
+      {"id": 4, "name": "Dr. David", "days_off": "2024-09-07,2024-09-27"},
+      {"id": 5, "name": "Dr. Eve", "days_off": "2024-09-03,2024-09-18"}
+    ],
+    "schedules": [
+      {"id": 1, "month": "September", "year": 2024, "status": "Draft"}
+    ],
+    "shifts": [
+      {"id": 1, "schedule_id": 1, "doctor_id": 1, "date": "2024-09-01", "status": "Assigned"},
+      {"id": 2, "schedule_id": 1, "doctor_id": 2, "date": "2024-09-02", "status": "Assigned"},
+      {"id": 3, "schedule_id": 1, "doctor_id": 3, "date": "2024-09-03", "status": "Assigned"},
+      {"id": 4, "schedule_id": 1, "doctor_id": 4, "date": "2024-09-04", "status": "Assigned"},
+      {"id": 5, "schedule_id": 1, "doctor_id": 5, "date": "2024-09-05", "status": "Assigned"}
+    ],
+    "admin_users": [
+      {"id": 1, "username": "admin", "password": "hashed_password"}
+    ]
+  }
+  
