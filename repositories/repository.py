@@ -2,11 +2,28 @@ from sqlalchemy.orm import Session
 from repositories.dao import DoctorDAO, ScheduleDAO, ShiftDAO
 from database.models import Doctor, Schedule, Shift
 
-
 # Doctor Repository - Business Rules
 class DoctorRepository:
+    """
+    Repository for managing Doctor-related database operations and business rules.
+    """
+
     @staticmethod
     def add_doctor(session: Session, name: str, days_off: str):
+        """
+        Adds a new doctor to the database.
+
+        Args:
+            session (Session): Database session.
+            name (str): Name of the doctor.
+            days_off (str): Comma-separated string of days off.
+
+        Returns:
+            Doctor: The newly created doctor.
+
+        Raises:
+            ValueError: If a doctor with the same name already exists.
+        """
         # Business rule: Ensure no duplicate doctor names
         existing_doctor = session.query(Doctor).filter(Doctor.name == name).first()
         if existing_doctor:
@@ -14,7 +31,33 @@ class DoctorRepository:
         return DoctorDAO.create_doctor(session, name, days_off)
 
     @staticmethod
+    def get_all_doctors(session: Session):
+        """
+        Retrieves all doctors from the database.
+
+        Args:
+            session (Session): Database session.
+
+        Returns:
+            list: List of all doctors.
+        """
+        return session.query(Doctor).all()
+
+    @staticmethod
     def get_doctor_with_shifts(session: Session, doctor_id: int):
+        """
+        Retrieves a doctor along with their assigned shifts.
+
+        Args:
+            session (Session): Database session.
+            doctor_id (int): ID of the doctor.
+
+        Returns:
+            dict: Doctor details and assigned shifts.
+
+        Raises:
+            ValueError: If the doctor is not found.
+        """
         # Fetch doctor details
         doctor = session.query(Doctor).filter(Doctor.id == doctor_id).first()
         if not doctor:
@@ -24,6 +67,58 @@ class DoctorRepository:
         shifts = session.query(Shift).filter(Shift.doctor_id == doctor_id).all()
         return {"doctor": doctor, "shifts": shifts}
 
+    @staticmethod
+    def update_doctor(session: Session, doctor_id: int, name: str, days_off: str):
+        """
+        Updates a doctor's details.
+
+        Args:
+            session (Session): Database session.
+            doctor_id (int): ID of the doctor.
+            name (str): Updated name of the doctor.
+            days_off (str): Updated days off.
+
+        Returns:
+            Doctor: The updated doctor object.
+
+        Raises:
+            ValueError: If the doctor is not found.
+        """
+        doctor = session.query(Doctor).filter(Doctor.id == doctor_id).first()
+        if not doctor:
+            raise ValueError("Doctor not found.")
+
+        # Update fields if provided
+        if name:
+            doctor.name = name
+        if days_off:
+            doctor.days_off = days_off
+
+        session.commit()
+        return doctor
+
+    @staticmethod
+    def delete_doctor(session: Session, doctor_id: int):
+        """
+        Deletes a doctor from the database.
+
+        Args:
+            session (Session): Database session.
+            doctor_id (int): ID of the doctor.
+
+        Returns:
+            bool: True if deletion was successful.
+
+        Raises:
+            ValueError: If the doctor is not found.
+        """
+        doctor = session.query(Doctor).filter(Doctor.id == doctor_id).first()
+        if not doctor:
+            raise ValueError("Doctor not found.")
+
+        session.delete(doctor)
+        session.commit()
+        return True
 
 # Schedule Repository - Business Rules
 class ScheduleRepository:
@@ -48,7 +143,6 @@ class ScheduleRepository:
         schedule.status = "Finalized"
         session.commit()
         return schedule
-
 
 # Shift Repository - Business Rules
 class ShiftRepository:
