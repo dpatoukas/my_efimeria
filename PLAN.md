@@ -1,110 +1,109 @@
-# Plan for Saving Solution to Database
+# Next Steps for API Development
 
-## Overview
-This plan outlines the approach for saving the generated schedule results into the database using the existing DAO, repository, and service layers.
+## 1. Doctor Management Endpoints
 
----
+### **Endpoints to Implement:**
+| Endpoint                        | Method | Purpose                                                  |
+|---------------------------------|--------|----------------------------------------------------------|
+| `/api/doctors`                   | GET    | Retrieve all doctors.                                    |
+| `/api/doctors`                   | POST   | Add a new doctor (name, days off).                       |
+| `/api/doctors/{id}`              | GET    | Retrieve details of a specific doctor.                   |
+| `/api/doctors/{id}`              | PUT    | Update doctor details (e.g., name, days off).            |
+| `/api/doctors/{id}`              | DELETE | Remove a doctor from the system.                         |
 
-## 1. Architecture Approach
-We will leverage the **current architecture** to implement the solution:
-- **DAO Layer**: Handles direct database interactions.
-- **Repository Layer**: Applies business rules and validation.
-- **Service Layer**: Processes the solution and interacts with the repository.
-
-This ensures **separation of concerns** and maintains a modular and scalable design.
-
----
-
-## 2. Implementation Plan
-
-### **Step 1: Extend Repository Layer**
-
-Add a method in the **`ShiftRepository`** to handle bulk insertion of shifts:
-
-```python
-@staticmethod
-def save_shifts(session: Session, schedule_id: int, shifts: list):
-    """
-    Saves multiple shifts in bulk to improve performance.
-    """
-    for shift in shifts:
-        # Check for conflicts before saving
-        existing_shift = session.query(Shift).filter(
-            Shift.doctor_id == shift['doctor_id'], Shift.date == shift['date']
-        ).first()
-        if existing_shift:
-            raise ValueError(f"Conflict: Doctor {shift['doctor_id']} already assigned on {shift['date']}.")
-
-        # Save each shift
-        ShiftDAO.create_shift(
-            session,
-            schedule_id,
-            shift['doctor_id'],
-            shift['date'],
-            "Assigned"
-        )
-```
+### **Steps:**
+1. Create service methods in `services/doctor_service.py` for CRUD operations.
+2. Implement route handlers in `api/doctor_routes.py`.
+3. Register routes in `api/__init__.py`.
+4. Add tests for all endpoints.
+5. Test endpoints with Postman or cURL.
 
 ---
 
-### **Step 2: Add Service Layer Logic**
+## 2. Shift Management Endpoints
 
-Implement **`save_solution_to_db`** in the **`SolutionService`**:
+### **Endpoints to Implement:**
+| Endpoint                                 | Method | Purpose                                                                 |
+|------------------------------------------|--------|-------------------------------------------------------------------------|
+| `/api/shifts?schedule_id={id}`            | GET    | Retrieve shifts for a specific schedule.                                |
+| `/api/shifts`                             | POST   | Assign a new shift (schedule ID, doctor ID, date).                      |
+| `/api/shifts/{id}`                         | PUT    | Update an individual shift (e.g., change doctor or date).               |
+| `/api/shifts/{id}`                         | DELETE | Remove a shift from a schedule.                                         |
 
-```python
-def save_solution_to_db(self, session, schedule_id, solution):
-    """
-    Saves the generated solution to the database using the repository layer.
-    """
-    # Prepare shift data
-    shifts = []
-    for day in range(len(solution)):
-        for doctor_idx, assigned in enumerate(solution[day]):
-            if assigned == 1:  # Assigned shift
-                shifts.append({
-                    'doctor_id': doctor_idx + 1,  # Assuming IDs start at 1
-                    'date': f"2025-01-{day + 1}"  # Replace with actual dates
-                })
-
-    # Use repository to save shifts
-    from repositories.repository import ShiftRepository
-    ShiftRepository.save_shifts(session, schedule_id, shifts)
-    print("Solution saved successfully!")
-```
+### **Steps:**
+1. Create service methods in `services/shift_service.py` for CRUD operations.
+2. Implement route handlers in `api/shift_routes.py`.
+3. Register routes in `api/__init__.py`.
+4. Add tests for all endpoints.
+5. Test endpoints with Postman or cURL.
 
 ---
 
-### **Step 3: Integrate in Main Script**
+## 3. Reports and Export Enhancements
 
-Update **`main.py`** to save the solution:
+### **Endpoints to Implement:**
+| Endpoint                                | Method | Purpose                                                                 |
+|-----------------------------------------|--------|-------------------------------------------------------------------------|
+| `/api/reports/export`                    | POST   | Export schedules and reports for analysis (PDF or CSV).                  |
+| `/api/reports/logs`                       | GET    | View system logs for debugging and auditing purposes.                     |
 
-```python
-# Run Genetic Algorithm
-best_solution = solution_service.run_genetic_algorithm()
-
-# Save the solution to the database
-solution_service.save_solution_to_db(session, schedule_id, best_solution)
-```
-
----
-
-## 3. Advantages of the Approach
-
-1. **Scalability**: Bulk insertion improves performance for large schedules.
-2. **Validation**: Prevents conflicts or double-bookings through repository checks.
-3. **Flexibility**: Service handles the processing logic, keeping the layers clean.
-4. **Maintainability**: Modular approach simplifies testing and debugging.
+### **Steps:**
+1. Add methods to export reports and logs in `services/report_service.py`.
+2. Implement route handlers in `api/report_routes.py`.
+3. Register routes in `api/__init__.py`.
+4. Add tests for all endpoints.
+5. Test endpoints with Postman or cURL.
 
 ---
 
-## 4. Next Steps
-1. Implement and test the code changes.
-2. Validate the solution with test data.
-3. Add REST endpoints to expose schedules.
-4. Document the API for frontend integration.
+## 4. Security Enhancements
+
+### **Key Tasks:**
+- Improve JWT authentication with role-based access.
+- Implement error handling middleware for better debugging.
+- Enable Cross-Origin Resource Sharing (CORS) if required for frontend.
+
+### **Steps:**
+1. Update JWT configuration in `api/__init__.py`.
+2. Create middleware for error handling in `middlewares/error_handler.py`.
+3. Add CORS support if needed using `Flask-CORS`.
+4. Test security features.
 
 ---
 
-## Conclusion
-This plan adheres to the existing architecture, ensuring scalability, modularity, and maintainability. It is ready for implementation and testing. Let me know if additional refinements are needed!
+## 5. Documentation and Testing
 
+### **Key Tasks:**
+- Add Swagger documentation for all API endpoints.
+- Write unit and integration tests using pytest.
+
+### **Steps:**
+1. Install `flask-swagger-ui` and configure Swagger documentation.
+2. Write test cases in the `tests/` directory for all endpoints.
+3. Test endpoints and generate coverage reports.
+
+---
+
+## 6. Deployment Preparation
+
+### **Key Tasks:**
+- Containerize the application using Docker.
+- Prepare deployment scripts for production.
+
+### **Steps:**
+1. Create a `Dockerfile` and `.dockerignore`.
+2. Build and test Docker images locally.
+3. Deploy to a cloud service (optional).
+
+---
+
+## 7. Move to Frontend Development
+
+### **Key Tasks:**
+- Choose frontend framework (Angular or React).
+- Create views for doctors, schedules, and shifts.
+- Integrate frontend with backend API.
+
+---
+
+Let me know which step you'd like to tackle next!
