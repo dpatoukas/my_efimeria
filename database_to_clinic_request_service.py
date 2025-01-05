@@ -118,11 +118,11 @@ class DatabaseToClinicRequestService:
         """
         preference_matrix = []
         for doctor in doctor_names:
-            print(f"\nDoctor: {doctor}")
+            # print(f"\nDoctor: {doctor}")
             preference = []
             for day in total_days:
-                formatted_date = day.strftime("%Y-%m-%d")
-                print(f"Date: {formatted_date}, Days Off: {doctor_days_off.get(doctor)}, Match: {formatted_date in doctor_days_off.get(doctor, [])}")
+                # formatted_date = day.strftime("%Y-%m-%d")
+                # print(f"Date: {formatted_date}, Days Off: {doctor_days_off.get(doctor)}, Match: {formatted_date in doctor_days_off.get(doctor, [])}")
                 if doctor == "NA":
                     preference.append("NA")  # Placeholder if no doctors
                 elif day.strftime("%Y-%m-%d") in doctor_days_off.get(doctor, []):
