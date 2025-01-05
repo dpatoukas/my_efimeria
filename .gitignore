@@ -9,6 +9,9 @@ clinic_schedule.db
 migrations/versions/*.pyc
 migrations/versions/*.pyo
 
+repositories/__pyc*
+
+
 # Logs and debug
 *.log
 logs/
