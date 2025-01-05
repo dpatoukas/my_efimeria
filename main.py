@@ -7,8 +7,9 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from database_to_clinic_request_service import DatabaseToClinicRequestService
-from doctor_scheduling_service import DoctorSchedulingProblem
+from services.database_to_clinic_request_service import DatabaseToClinicRequestService
+from services.doctor_scheduling_service import DoctorSchedulingProblem
+from services.solution_service import SolutionService
 import numpy as np
 
 # Database Configuration
@@ -52,5 +53,11 @@ problem.print_problem_data()
 # Generate and Test Example Solution
 solution = np.random.randint(2, size=len(doctorNames) * 30)  # Example random solution
 problem.printScheduleInfo(solution)
+
+# Initialize Solution Service
+solution_service = SolutionService(problem)
+
+# Run Genetic Algorithm
+best_solution = solution_service.run_genetic_algorithm()
 
 session.close()
