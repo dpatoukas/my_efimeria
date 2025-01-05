@@ -61,3 +61,50 @@ class ShiftRepository:
         if existing_shift:
             raise ValueError("Doctor is already assigned a shift on this date.")
         return ShiftDAO.create_shift(session, schedule_id, doctor_id, date, "Assigned")
+    
+    @staticmethod
+    def save_shifts(session: Session, schedule_id: int, shifts: list):
+        """
+        Saves multiple shifts in bulk to improve performance.
+
+        Parameters:
+        - session (Session): Database session for transactions.
+        - schedule_id (int): ID of the schedule to associate shifts.
+        - shifts (list): List of dictionaries with shift details (doctor_id, date).
+
+        Raises:
+        - ValueError: If a conflict arises during shift assignment.
+        """
+        for shift in shifts:
+            # Check for conflicts before saving
+            existing_shift = session.query(Shift).filter(
+                Shift.doctor_id == shift['doctor_id'], Shift.date == shift['date']
+            ).first()
+            if existing_shift:
+                raise ValueError(f"Conflict: Doctor {shift['doctor_id']} already assigned on {shift['date']}.")
+
+            # Save each shift
+            ShiftDAO.create_shift(
+                session,
+                schedule_id,
+                shift['doctor_id'],
+                shift['date'],
+                "Assigned"
+            )
+
+        # Commit changes after all inserts
+        session.commit()
+        print("Shifts saved successfully!")
+    
+    @staticmethod
+    def clear_shifts_for_schedule(session: Session, schedule_id: int):
+        """
+        Deletes all shifts associated with a given schedule.
+
+        Parameters:
+        - session (Session): Database session.
+        - schedule_id (int): ID of the schedule to clear shifts for.
+        """
+        session.query(Shift).filter_by(schedule_id=schedule_id).delete()
+        session.commit()
+        print(f"All shifts cleared for schedule ID {schedule_id}")
