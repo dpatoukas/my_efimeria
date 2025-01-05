@@ -137,10 +137,10 @@ class DatabaseToClinicRequestService:
         Prints all data from the MonthlyClinicRequest dictionary.
         """
         print(f"\nTarget Month: {clinic_request['month']}")
-        print(f"Numbering of Days: {clinic_request['numberOfDays']}")
-        print(f"Order of Days: {clinic_request['orderOfDays']}")
-        print(f"Weekend Positions: {clinic_request['weekendPositions']}")
+        # print(f"Numbering of Days: {clinic_request['numberOfDays']}")
+        # print(f"Order of Days: {clinic_request['orderOfDays']}")
+        # print(f"Weekend Positions: {clinic_request['weekendPositions']}")
         print(f"Doctors Available: {clinic_request['doctorNames']}")
         print(f"Doctor Preferences: {clinic_request['doctorPreference']}")
-        print(f"Total Shifts Required/Day: {clinic_request['totalShifts']}")
+        # print(f"Total Shifts Required/Day: {clinic_request['totalShifts']}")
         print(f"Max and Min Shifts: {clinic_request['maxShifts']}, {clinic_request['minShifts']}")

@@ -16,6 +16,10 @@ engine = create_engine(DATABASE_URL)
 Session = sessionmaker(bind=engine)
 session = Session()
 
+#Input File 
+
+input_file = './database/test_data/exclusion_test_data.json'
+
 # Clear the Database
 def clear_database():
     session.query(Shift).delete()
@@ -26,12 +30,12 @@ def clear_database():
     print("Database cleared successfully.")
 
 def load_test_data():
-    # Get the directory of the script
-    base_dir = os.path.dirname(os.path.abspath(__file__))
-    file_path = os.path.join(base_dir, 'test_data.json')  # Use absolute path
+    # # Get the directory of the script
+    # base_dir = os.path.dirname(os.path.abspath(__file__))
+    # file_path = os.path.join(base_dir, input_file)  # Use absolute path
 
     # Load JSON data
-    with open(file_path, 'r') as file:
+    with open(input_file, 'r') as file:
         data = json.load(file)
 
     # Insert Doctors
