@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-from genetic_algorithm import eaSimpleWithElitism
+from services.genetic_algorithm import eaSimpleWithElitism
 
 
 class SolutionService:

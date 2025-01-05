@@ -8,7 +8,7 @@ import numpy
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-from genetic_algorithm import eaSimpleWithElitism
+# from genetic_algorithm import eaSimpleWithElitism
 # from doctors import DoctorSchedulingProblem
 from doctor_scheduling import DoctorSchedulingProblem
 from clinic_request import MonthlyClinicRequest

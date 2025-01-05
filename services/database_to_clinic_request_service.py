@@ -5,7 +5,7 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from sqlalchemy.orm import Session
-from monthly_clinic_request import create_monthly_clinic_request
+from services.monthly_clinic_request import create_monthly_clinic_request
 from database.models import Doctor, Schedule, Shift
 from datetime import datetime
 import calendar

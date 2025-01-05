@@ -7,9 +7,9 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from database_to_clinic_request_service import DatabaseToClinicRequestService
-from doctor_scheduling_service import DoctorSchedulingProblem
-from solution_service import SolutionService
+from services.database_to_clinic_request_service import DatabaseToClinicRequestService
+from services.doctor_scheduling_service import DoctorSchedulingProblem
+from services.solution_service import SolutionService
 import numpy as np
 
 # Database Configuration
