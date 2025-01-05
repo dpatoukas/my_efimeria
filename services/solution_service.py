@@ -27,7 +27,7 @@ class SolutionService:
         POPULATION_SIZE = 900
         P_CROSSOVER = 0.9
         P_MUTATION = 0.3
-        MAX_GENERATIONS = 1000
+        MAX_GENERATIONS = 200
         HALL_OF_FAME_SIZE = 450
 
         # Random Seed

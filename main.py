@@ -24,6 +24,9 @@ service = DatabaseToClinicRequestService(session)
 # Generate Clinic Request
 clinic_request = service.get_monthly_clinic_request("September", 2024)
 
+# Print all data
+service.print_request_info(clinic_request)
+
 # Extract data from clinic_request
 doctorNames = clinic_request['doctorNames']
 doctorPreference = clinic_request['doctorPreference']
@@ -44,8 +47,6 @@ problem = DoctorSchedulingProblem(
     doctorExperience=doctorExperience
 )
 
-# Print all data
-service.print_request_info(clinic_request)
 
 # Print Doctor Scheduling Problem data
 problem.print_problem_data()

@@ -190,9 +190,10 @@ class DoctorSchedulingProblem:
         """
         Prints the problem data and constraints.
         """
+        print("Scheduling Doctor Problem Ready")
         print("Doctors:", self.doctors)
-        print("Experience Levels:", self.doctorExperience)
+        # print("Experience Levels:", self.doctorExperience)
         print("Shift Preferences:", self.doctorShiftPreference)
-        print("Max Shifts per Day:", self.doctorshiftMax)
-        print("Min Shifts per Day:", self.doctorshiftMin)
-        print("Weekend Positions:", self.weekendPositionArray)
+        # print("Max Shifts per Day:", self.doctorshiftMax)
+        # print("Min Shifts per Day:", self.doctorshiftMin)
+        # print("Weekend Positions:", self.weekendPositionArray)
