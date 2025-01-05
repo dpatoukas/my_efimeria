@@ -1,11 +1,34 @@
-# High-Level Architecture and Development Plan
+# Clinic Scheduling Application
 
 ## Overview
-This document outlines the high-level architecture and the structured development steps required to complete the Clinic Scheduling Application. The application calculates and manages monthly work schedules for doctors based on constraints and preferences.
+The Clinic Scheduling Application calculates and manages monthly work schedules for doctors based on constraints and preferences. This document outlines the high-level goal, project progress, and detailed information about data interfaces, repositories, migrations, technology stack, tools, architecture, and organization.
 
----
+## High-Level Goal
+The primary goal of this project is to develop a robust and efficient scheduling system for clinics that optimizes doctor schedules while considering various constraints and preferences.
 
-## High-Level Architecture
+## Project Progress
+- Database schema designed and implemented.
+- Data Access Objects (DAO) and repositories created.
+- Basic CRUD operations established.
+- Initial scheduling algorithm implemented.
+- REST API endpoints exposed.
+- Authentication and authorization mechanisms in place.
+
+## Technology Stack
+- **Backend**: Python, Flask
+- **Database**: SQLite, SQLAlchemy
+- **Frontend**: HTML, CSS, JavaScript (planned)
+- **Authentication**: JWT Tokens
+- **Testing**: PyTest
+- **Version Control**: Git
+
+## Tools
+- **IDE**: Visual Studio Code
+- **Database Management**: SQLite Browser
+- **Version Control**: GitHub
+- **Project Management**: Trello
+
+## Architecture
 
 ### Backend Architecture
 - **Database Layer (SQLAlchemy with SQLite)**
@@ -27,25 +50,40 @@ This document outlines the high-level architecture and the structured developmen
 - **Authentication/Authorization**
   - Ensures secure user access with JWT tokens.
 
-### Frontend Architecture
-- **Framework Options:**
-  - **React.js or Angular** for Client-Side Rendering (CSR).
-  - Flask/Django templates for Server-Side Rendering (SSR).
-- **UI Components:**
-  - Calendar view for scheduling.
-  - Forms for entering doctor preferences.
-  - Tables to display schedules.
+## Data Interfaces
+- **DAO (Data Access Objects)**
+  - Abstracts and encapsulates all access to the data source.
+  - Provides an interface for performing CRUD operations.
 
-### External Libraries and Tools
-- **SQLAlchemy** - ORM for database interaction.
-- **Alembic** - Schema migrations.
-- **PyJWT** - Authentication.
-- **Pydantic** - Input validation.
-- **FullCalendar.js** - Frontend calendar view.
-- **Docker** - Containerization.
-- **Postman/Selenium** - API and end-to-end testing.
+- **Repository**
+  - Acts as a mediator between the data access layer and the business logic layer.
+  - Contains business rules and logic for data retrieval and manipulation.
 
----
+## Migrations
+- **Alembic**: Used for handling database migrations to ensure the schema evolves as the application grows.
+
+## Organization
+- **Models**: Define the structure of the database tables.
+- **Repositories**: Contain business logic and data retrieval methods.
+- **Services**: Implement core application logic and algorithms.
+- **Controllers**: Handle HTTP requests and responses.
+- **Tests**: Ensure the correctness and reliability of the application.
+
+## Important Functionalities
+- **Doctor Scheduling**: Optimizes monthly schedules based on constraints and preferences.
+- **CRUD Operations**: Manage doctors, schedules, and shifts.
+- **Authentication**: Secure user access with JWT tokens.
+- **REST API**: Exposes endpoints for frontend interaction.
+
+## Usage
+1. Clone the repository.
+2. Set up the virtual environment and install dependencies.
+3. Run database migrations.
+4. Start the Flask server.
+5. Access the API endpoints to interact with the application.
+
+## Conclusion
+This Clinic Scheduling Application aims to streamline the scheduling process for clinics, ensuring efficient and optimized schedules for doctors. The project is structured to be modular, maintainable, and scalable, with a clear separation of concerns across different layers of the architecture.
 
 ## Development Steps
 
