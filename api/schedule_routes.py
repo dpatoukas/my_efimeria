@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify, Response
 from flask_jwt_extended import jwt_required
 from database.database_setup import Session
 from services.schedule_service import ScheduleService
+from flasgger import swag_from
 import logging
 
 # Create blueprint for schedule routes
@@ -9,17 +10,31 @@ schedule_blueprint = Blueprint('schedule', __name__)
 
 @schedule_blueprint.route('/generate', methods=['POST'])
 @jwt_required()
+@swag_from({
+    'tags': ['Schedules'],
+    'summary': 'Generate a schedule',
+    'description': 'Generates a new schedule for a given month and year.',
+    'parameters': [
+        {
+            'name': 'body',
+            'in': 'body',
+            'required': True,
+            'schema': {
+                'type': 'object',
+                'properties': {
+                    'month': {'type': 'string', 'example': 'January'},
+                    'year': {'type': 'integer', 'example': 2025}
+                },
+                'required': ['month', 'year']
+            }
+        }
+    ],
+    'responses': {
+        201: {'description': 'Schedule generated successfully'},
+        500: {'description': 'Internal server error'}
+    }
+})
 def generate_schedule():
-    """
-    Generates a schedule based on input month and year.
-
-    Request Body:
-        - month (str): Month for schedule generation.
-        - year (int): Year for schedule generation.
-
-    Returns:
-        JSON response with success or error message.
-    """
     session = Session()
     try:
         data = request.json
@@ -34,19 +49,23 @@ def generate_schedule():
     finally:
         session.close()
 
+
 @schedule_blueprint.route('/history', methods=['GET'])
 @jwt_required()
+@swag_from({
+    'tags': ['Schedules'],
+    'summary': 'Get schedule history',
+    'description': 'Retrieve schedules based on optional filters like month and year.',
+    'parameters': [
+        {'name': 'month', 'in': 'query', 'type': 'string', 'required': False, 'description': 'Filter by month'},
+        {'name': 'year', 'in': 'query', 'type': 'integer', 'required': False, 'description': 'Filter by year'}
+    ],
+    'responses': {
+        200: {'description': 'List of schedules'},
+        500: {'description': 'Internal server error'}
+    }
+})
 def browse_schedules():
-    """
-    Retrieves schedules based on optional filters like month and year.
-
-    Query Parameters:
-        - month (str, optional): Filter schedules by month.
-        - year (int, optional): Filter schedules by year.
-
-    Returns:
-        JSON response with list of schedules or error message.
-    """
     session = Session()
     try:
         month = request.args.get('month')
@@ -60,18 +79,22 @@ def browse_schedules():
     finally:
         session.close()
 
+
 @schedule_blueprint.route('/<int:id>', methods=['GET'])
 @jwt_required()
+@swag_from({
+    'tags': ['Schedules'],
+    'summary': 'Get schedule details',
+    'description': 'Retrieve details of a specific schedule by ID.',
+    'parameters': [
+        {'name': 'id', 'in': 'path', 'type': 'integer', 'required': True, 'description': 'Schedule ID'}
+    ],
+    'responses': {
+        200: {'description': 'Schedule details'},
+        500: {'description': 'Internal server error'}
+    }
+})
 def get_schedule(id):
-    """
-    Retrieves details of a specific schedule by ID.
-
-    URL Parameter:
-        - id (int): Schedule ID.
-
-    Returns:
-        JSON response with schedule details or error message.
-    """
     session = Session()
     try:
         schedule = ScheduleService.get_schedule_by_id(session, id)
@@ -83,21 +106,33 @@ def get_schedule(id):
     finally:
         session.close()
 
+
 @schedule_blueprint.route('/<int:id>', methods=['PUT'])
 @jwt_required()
+@swag_from({
+    'tags': ['Schedules'],
+    'summary': 'Update schedule status',
+    'description': 'Updates the status of a specific schedule.',
+    'parameters': [
+        {'name': 'id', 'in': 'path', 'type': 'integer', 'required': True, 'description': 'Schedule ID'},
+        {
+            'name': 'body',
+            'in': 'body',
+            'required': True,
+            'schema': {
+                'type': 'object',
+                'properties': {
+                    'status': {'type': 'string', 'example': 'Finalized'}
+                }
+            }
+        }
+    ],
+    'responses': {
+        200: {'description': 'Schedule updated successfully'},
+        500: {'description': 'Internal server error'}
+    }
+})
 def update_schedule(id):
-    """
-    Updates the status of a specific schedule.
-
-    URL Parameter:
-        - id (int): Schedule ID.
-
-    Request Body:
-        - status (str): New status for the schedule.
-
-    Returns:
-        JSON response with success or error message.
-    """
     session = Session()
     try:
         data = request.json
@@ -111,41 +146,22 @@ def update_schedule(id):
     finally:
         session.close()
 
-@schedule_blueprint.route('/<int:id>/finalize', methods=['POST'])
-@jwt_required()
-def finalize_schedule(id):
-    """
-    Finalizes a schedule by locking its status.
-
-    URL Parameter:
-        - id (int): Schedule ID.
-
-    Returns:
-        JSON response with success or error message.
-    """
-    session = Session()
-    try:
-        result = ScheduleService.update_schedule(session, id, 'Finalized')
-        logging.info(f"Finalized schedule ID {id}.")
-        return jsonify(result), 200
-    except Exception as e:
-        logging.error(f"Error finalizing schedule: {str(e)}")
-        return jsonify({'error': str(e)}), 500
-    finally:
-        session.close()
 
 @schedule_blueprint.route('/export/<int:id>', methods=['GET'])
 @jwt_required()
+@swag_from({
+    'tags': ['Schedules'],
+    'summary': 'Export schedule as CSV',
+    'description': 'Exports a schedule by ID as a CSV file.',
+    'parameters': [
+        {'name': 'id', 'in': 'path', 'type': 'integer', 'required': True, 'description': 'Schedule ID'}
+    ],
+    'responses': {
+        200: {'description': 'CSV file exported successfully'},
+        500: {'description': 'Internal server error'}
+    }
+})
 def export_schedule(id):
-    """
-    Exports a schedule as a CSV file.
-
-    URL Parameter:
-        - id (int): Schedule ID.
-
-    Returns:
-        CSV file as a response or error message.
-    """
     session = Session()
     try:
         response = ScheduleService.export_schedule_as_csv(session, id)

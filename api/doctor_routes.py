@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from database.database_setup import Session as DBSession
 from services.doctor_service import DoctorService
 from flask_jwt_extended import jwt_required
+from flasgger import swag_from
 
 # Create a blueprint for doctor routes
 doctor_blueprint = Blueprint('doctor', __name__)
@@ -10,13 +11,24 @@ doctor_blueprint = Blueprint('doctor', __name__)
 
 @doctor_blueprint.route('/', methods=['GET'])
 @jwt_required()
+@swag_from({
+    'tags': ['Doctors'],
+    'summary': 'Get all doctors',
+    'description': 'Retrieve a list of all doctors with their details.',
+    'responses': {
+        200: {
+            'description': 'List of doctors',
+            'examples': {
+                'application/json': [
+                    {'id': 1, 'name': 'Dr. Brown', 'days_off': '2025-01-01,2025-01-02'},
+                    {'id': 2, 'name': 'Dr. Smith', 'days_off': '2025-01-03,2025-01-04'}
+                ]
+            }
+        },
+        400: {'description': 'Bad request'}
+    }
+})
 def get_doctors():
-    """
-    Retrieve all doctors.
-
-    Returns:
-        JSON response with a list of doctors or an error message.
-    """
     session: Session = DBSession()
     try:
         doctors = DoctorService.get_all_doctors(session)
@@ -29,16 +41,36 @@ def get_doctors():
 
 @doctor_blueprint.route('/<int:doctor_id>', methods=['GET'])
 @jwt_required()
+@swag_from({
+    'tags': ['Doctors'],
+    'summary': 'Get a specific doctor',
+    'description': 'Retrieve details of a specific doctor by their ID.',
+    'parameters': [
+        {
+            'name': 'doctor_id',
+            'in': 'path',
+            'required': True,
+            'type': 'integer',
+            'description': 'Doctor ID'
+        }
+    ],
+    'responses': {
+        200: {
+            'description': 'Doctor details',
+            'schema': {
+                'type': 'object',
+                'properties': {
+                    'id': {'type': 'integer'},
+                    'name': {'type': 'string'},
+                    'days_off': {'type': 'string'},
+                    'shifts': {'type': 'array'}
+                }
+            }
+        },
+        404: {'description': 'Doctor not found'}
+    }
+})
 def get_doctor(doctor_id):
-    """
-    Retrieve a specific doctor by ID.
-
-    Args:
-        doctor_id (int): Doctor ID.
-
-    Returns:
-        JSON response with doctor details or an error message.
-    """
     session: Session = DBSession()
     try:
         doctor = DoctorService.get_doctor_by_id(session, doctor_id)
@@ -56,17 +88,30 @@ def get_doctor(doctor_id):
 
 @doctor_blueprint.route('/', methods=['POST'])
 @jwt_required()
+@swag_from({
+    'tags': ['Doctors'],
+    'summary': 'Create a new doctor',
+    'description': 'Add a new doctor with their details.',
+    'parameters': [
+        {
+            'name': 'body',
+            'in': 'body',
+            'required': True,
+            'schema': {
+                'type': 'object',
+                'properties': {
+                    'name': {'type': 'string'},
+                    'days_off': {'type': 'string'}
+                }
+            }
+        }
+    ],
+    'responses': {
+        201: {'description': 'Doctor created successfully'},
+        400: {'description': 'Bad request'}
+    }
+})
 def create_doctor():
-    """
-    Add a new doctor.
-
-    Request Body:
-        - name (str): Name of the doctor.
-        - days_off (str): Comma-separated days off.
-
-    Returns:
-        JSON response with the created doctor or an error message.
-    """
     session: Session = DBSession()
     try:
         data = request.json
@@ -80,20 +125,37 @@ def create_doctor():
 
 @doctor_blueprint.route('/<int:doctor_id>', methods=['PUT'])
 @jwt_required()
+@swag_from({
+    'tags': ['Doctors'],
+    'summary': 'Update a doctor',
+    'description': 'Modify an existing doctor’s details.',
+    'parameters': [
+        {
+            'name': 'doctor_id',
+            'in': 'path',
+            'required': True,
+            'type': 'integer',
+            'description': 'Doctor ID'
+        },
+        {
+            'name': 'body',
+            'in': 'body',
+            'required': True,
+            'schema': {
+                'type': 'object',
+                'properties': {
+                    'name': {'type': 'string'},
+                    'days_off': {'type': 'string'}
+                }
+            }
+        }
+    ],
+    'responses': {
+        200: {'description': 'Doctor updated successfully'},
+        400: {'description': 'Bad request'}
+    }
+})
 def update_doctor(doctor_id):
-    """
-    Update an existing doctor's details.
-
-    Args:
-        doctor_id (int): Doctor ID.
-
-    Request Body:
-        - name (str, optional): Updated name of the doctor.
-        - days_off (str, optional): Updated days off.
-
-    Returns:
-        JSON response with updated doctor details or an error message.
-    """
     session: Session = DBSession()
     try:
         data = request.json
@@ -112,16 +174,25 @@ def update_doctor(doctor_id):
 
 @doctor_blueprint.route('/<int:doctor_id>', methods=['DELETE'])
 @jwt_required()
+@swag_from({
+    'tags': ['Doctors'],
+    'summary': 'Delete a doctor',
+    'description': 'Remove a doctor from the system.',
+    'parameters': [
+        {
+            'name': 'doctor_id',
+            'in': 'path',
+            'required': True,
+            'type': 'integer',
+            'description': 'Doctor ID'
+        }
+    ],
+    'responses': {
+        200: {'description': 'Doctor deleted successfully'},
+        400: {'description': 'Bad request'}
+    }
+})
 def delete_doctor(doctor_id):
-    """
-    Delete a doctor by ID.
-
-    Args:
-        doctor_id (int): Doctor ID.
-
-    Returns:
-        JSON response indicating success or failure.
-    """
     session: Session = DBSession()
     try:
         DoctorService.delete_doctor(session, doctor_id)
