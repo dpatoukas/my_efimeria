@@ -72,9 +72,19 @@ class ShiftService:
             logging.error("Missing required fields for updating shift.")
             raise ValueError("Shift ID, Doctor ID, and Date are required.")
 
-        # Delete and reassign the shift to handle date/doctor updates
+        # Retrieve the existing shift through the repository
+        existing_shift = ShiftRepository.get_shift_by_id(session, shift_id)
+        if not existing_shift:
+            raise ValueError("Shift not found.")
+
+        # Delete and reassign the shift with updated details
         ShiftRepository.delete_shift(session, shift_id)
-        return ShiftRepository.assign_shift(session, doctor_id, date)
+        return ShiftRepository.assign_shift(
+            session, 
+            existing_shift.schedule_id,  # Use the schedule_id from the old shift
+            doctor_id, 
+            date
+        )
 
     @staticmethod
     def delete_shift(session: Session, shift_id: int):

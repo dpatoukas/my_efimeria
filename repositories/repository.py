@@ -202,3 +202,57 @@ class ShiftRepository:
         session.query(Shift).filter_by(schedule_id=schedule_id).delete()
         session.commit()
         print(f"All shifts cleared for schedule ID {schedule_id}")
+
+    @staticmethod
+    def get_shifts_by_schedule(session: Session, schedule_id: int):
+        """
+        Retrieves all shifts for a specific schedule.
+
+        Args:
+            session (Session): Database session.
+            schedule_id (int): ID of the schedule.
+
+        Returns:
+            list: List of shifts.
+        """
+        return session.query(Shift).filter(Shift.schedule_id == schedule_id).all()
+
+    @staticmethod
+    def delete_shift(session: Session, shift_id: int):
+        """
+        Deletes a shift by ID.
+
+        Args:
+            session (Session): Database session.
+            shift_id (int): ID of the shift to delete.
+
+        Returns:
+            bool: True if deletion was successful.
+
+        Raises:
+            ValueError: If the shift is not found.
+        """
+        # Find the shift
+        shift = session.query(Shift).filter(Shift.id == shift_id).first()
+        if not shift:
+            raise ValueError("Shift not found.")
+
+        # Delete the shift
+        session.delete(shift)
+        session.commit()
+        return True
+    
+    @staticmethod
+    def get_shift_by_id(session: Session, shift_id: int):
+        """
+        Retrieves a shift by its ID.
+
+        Args:
+            session (Session): Database session.
+            shift_id (int): ID of the shift.
+
+        Returns:
+            Shift: The shift object if found, else None.
+        """
+        return session.query(Shift).filter(Shift.id == shift_id).first()
+
