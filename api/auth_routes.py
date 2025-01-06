@@ -1,11 +1,46 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import create_access_token
+from flasgger import swag_from
 import logging
 
 # Create blueprint for authentication routes
 auth_blueprint = Blueprint('auth', __name__)
 
 @auth_blueprint.route('/login', methods=['POST'])
+@swag_from({
+    'tags': ['Authentication'],
+    'summary': 'Login and obtain JWT token',
+    'description': 'Authenticates a user and generates a JWT token for access.',
+    'parameters': [
+        {
+            'name': 'body',
+            'in': 'body',
+            'required': True,
+            'schema': {
+                'type': 'object',
+                'properties': {
+                    'username': {'type': 'string', 'example': 'admin'},
+                    'password': {'type': 'string', 'example': 'password'}
+                },
+                'required': ['username', 'password']
+            }
+        }
+    ],
+    'responses': {
+        200: {
+            'description': 'Successful login',
+            'schema': {
+                'type': 'object',
+                'properties': {
+                    'access_token': {'type': 'string'}
+                }
+            }
+        },
+        401: {
+            'description': 'Invalid credentials'
+        }
+    }
+})
 def login():
     """
     Login endpoint to authenticate user and generate JWT token.
