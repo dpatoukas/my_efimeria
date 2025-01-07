@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
+import { Container, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Tooltip } from '@mui/material';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
 
@@ -51,33 +51,56 @@ const ScheduleDetailPage = () => {
   }, [id]);
 
   const getShiftForDoctorAndDay = (doctorId, day) => {
-    // Generate date in 'YYYY-MM-DD' format
     const date = `${schedule.year}-${String(new Date(Date.parse(`${schedule.month} 1, ${schedule.year}`)).getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-  
-    // Find matching shift
     const shift = shifts.find(s => s.doctor_id === doctorId && s.date === date);
-  
-    console.log(`Doctor: ${doctorId}, Day: ${day}, Date: ${date}, Shift: ${shift}`); // Debugging
-    return shift ? '✔️' : ''; // Show checkmark for assigned shifts
+    return shift ? (
+      <Tooltip title={`Shift ID: ${shift.id}`} arrow>
+        <span>✔️</span>
+      </Tooltip>
+    ) : '';
+  };
+
+  const exportToCSV = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get(`http://localhost:5000/api/schedules/export/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+        responseType: 'blob',
+      });
+
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `schedule_${id}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (error) {
+      console.error('Error exporting schedule:', error);
+    }
   };
 
   const styles = {
     container: {
-      width: '100vw',       // Full width of the viewport
-      height: '100vh',      // Full height of the viewport
-      overflow: 'auto',     // Add scrollbars if necessary
+      width: '100vw',
+      height: '100vh',
+      overflow: 'auto',
+    },
+    tableContainer: {
+      maxWidth: '100%',
+      overflowX: 'auto',
     },
     table: {
-      width: '100%',        // Make table take full width
-      borderCollapse: 'collapse', // Prevent gaps between cells
+      width: 'auto',
+      borderCollapse: 'collapse',
     },
     headerCell: {
-      minWidth: '50px',     // Adjust cell width for better spacing
-      textAlign: 'center',  // Center-align headers
+      minWidth: '40px',
+      textAlign: 'center',
     },
     bodyCell: {
-      minWidth: '50px',     // Adjust cell width
-      textAlign: 'center',  // Center-align content
+      minWidth: '40px',
+      textAlign: 'center',
     },
   };
 
@@ -90,8 +113,11 @@ const ScheduleDetailPage = () => {
           <Typography variant="h2" gutterBottom>
             {schedule.month} {schedule.year}
           </Typography>
-          <TableContainer component={Paper}>
-            <Table style={styles.table}>
+          <Button onClick={exportToCSV} variant="contained" color="primary" style={{ marginBottom: '1rem' }}>
+            Export to CSV
+          </Button>
+          <TableContainer component={Paper} style={styles.tableContainer}>
+            <Table style={styles.table} size="small">
               <TableHead>
                 <TableRow>
                   <TableCell style={styles.headerCell}>Doctor</TableCell>

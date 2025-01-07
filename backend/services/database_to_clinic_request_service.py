@@ -128,7 +128,10 @@ class DatabaseToClinicRequestService:
                 elif day.strftime("%Y-%m-%d") in doctor_days_off.get(doctor, []):
                     preference.append(0)  # Not available
                 else:
-                    preference.append(1)  # Available
+                    if day.day <= len(total_days):  # Match the number of days dynamically
+                        preference.append(1)  # Available
+                    else:
+                        preference.append(0)  # Default to unavailable for out-of-bound days
             preference_matrix.append(preference)
         return preference_matrix
 

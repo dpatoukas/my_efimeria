@@ -5,20 +5,14 @@ import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import json
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from database.database_setup import Session  # Use centralized configuration
 from database.models import Doctor, Schedule, Shift, AdminUser
-from database.database_setup import Base
 
-# Database Configuration
-DATABASE_URL = "sqlite:///clinic_schedule.db"  # Replace with your actual database URL
-engine = create_engine(DATABASE_URL)
-Session = sessionmaker(bind=engine)
+# Input File
+input_file = os.path.join(os.path.dirname(__file__), 'test_data/exclusion_test_data.json')
+
+# Create a session
 session = Session()
-
-#Input File 
-
-input_file = './database/test_data/exclusion_test_data.json'
 
 # Clear the Database
 def clear_database():
@@ -29,11 +23,8 @@ def clear_database():
     session.commit()
     print("Database cleared successfully.")
 
+# Load Test Data
 def load_test_data():
-    # # Get the directory of the script
-    # base_dir = os.path.dirname(os.path.abspath(__file__))
-    # file_path = os.path.join(base_dir, input_file)  # Use absolute path
-
     # Load JSON data
     with open(input_file, 'r') as file:
         data = json.load(file)
@@ -81,10 +72,8 @@ def load_test_data():
     session.commit()
     print("Test data inserted successfully.")
 
+# Print All Data
 def print_all_data():
-    """
-    Prints all the data stored in the database.
-    """
     print("\n--- Doctors ---")
     doctors = session.query(Doctor).all()
     for doctor in doctors:
@@ -111,7 +100,6 @@ def main():
     load_test_data()
     print_all_data()
     session.close()
-
 
 if __name__ == "__main__":
     main()

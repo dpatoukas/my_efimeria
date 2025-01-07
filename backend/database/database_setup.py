@@ -1,24 +1,20 @@
 import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
-# from dotenv import load_dotenv
+from dotenv import load_dotenv
 
-# Load environment variables from .env file
-# load_dotenv()
+# Load environment variables
+load_dotenv()
 
-# Get database URL from environment variables or use default
-# DATABASE_URL = os.getenv('DATABASE_URL', 'sqlite:///clinic_schedule.db')
+# Fetch database URL
+DATABASE_URL = os.getenv('DATABASE_URL', 'sqlite:///data/clinic_schedule.db')
+print(f"Resolved DB Path: {os.path.abspath('data/clinic_schedule.db')}")
 
 # Create database engine
-# engine = create_engine(DATABASE_URL, echo=True)
-
-# Connect to SQLite database
-engine = create_engine('sqlite:///clinic_schedule.db')
+engine = create_engine(DATABASE_URL, echo=True)
 
 # Create session factory
 Session = sessionmaker(bind=engine)
 
 # Define Base class for ORM models
 Base = declarative_base()
-
-

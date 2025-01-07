@@ -1,6 +1,8 @@
 from deap import base, creator, tools
 import random
 import os
+import calendar
+from datetime import datetime
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -14,7 +16,7 @@ from database.models import Schedule,Shift
 POPULATION_SIZE = 900
 P_CROSSOVER = 0.9
 P_MUTATION = 0.3
-MAX_GENERATIONS = 5
+MAX_GENERATIONS = 100
 HALL_OF_FAME_SIZE = 450
 RANDOM_SEED = 42
 
@@ -87,23 +89,23 @@ class SolutionService:
         print("-- Best Fitness = ", best.fitness.values[0])
         self.problem.printScheduleInfo(best)
 
-        # Plot fitness trends
-        min_fitness, avg_fitness = logbook.select("min", "avg")
-        sns.set_style("whitegrid")
-        plt.plot(min_fitness, color='red')
-        plt.plot(avg_fitness, color='green')
-        plt.xlabel('Generation')
-        plt.ylabel('Min / Average Fitness')
-        plt.title('Min and Average Fitness over Generations')
+        # # Plot fitness trends
+        # min_fitness, avg_fitness = logbook.select("min", "avg")
+        # sns.set_style("whitegrid")
+        # plt.plot(min_fitness, color='red')
+        # plt.plot(avg_fitness, color='green')
+        # plt.xlabel('Generation')
+        # plt.ylabel('Min / Average Fitness')
+        # plt.title('Min and Average Fitness over Generations')
 
-        # Save plot to 'dev_utils' directory
-        output_dir = 'dev_utils'
-        os.makedirs(output_dir, exist_ok=True)  # Create directory if it doesn't exist
-        plot_path = os.path.join(output_dir, 'fitness_trends.png')  # File path
+        # # Save plot to 'dev_utils' directory
+        # output_dir = 'dev_utils'
+        # os.makedirs(output_dir, exist_ok=True)  # Create directory if it doesn't exist
+        # plot_path = os.path.join(output_dir, 'fitness_trends.png')  # File path
 
-        plt.savefig(plot_path, format='png')  # Save as PNG
-        plt.close()  # Close the plot to free memory
-        print(f"Fitness trends plot saved at: {plot_path}")
+        # plt.savefig(plot_path, format='png')  # Save as PNG
+        # plt.close()  # Close the plot to free memory
+        # print(f"Fitness trends plot saved at: {plot_path}")
         
         return best
 
@@ -128,14 +130,24 @@ class SolutionService:
         # Clear existing shifts via repository
         ShiftRepository.clear_shifts_for_schedule(session, schedule.id)
 
-        # Prepare shift data
+        # Get the correct year and month dynamically
+        _, num_days = calendar.monthrange(year, list(calendar.month_name).index(month))
+
+        schedule_dates = [
+            datetime(year, list(calendar.month_name).index(month), day + 1).strftime("%Y-%m-%d")
+            for day in range(num_days)
+        ]
+
+        # Initialize shifts list before the loop
         shifts = []
-        for day in range(len(solution)):
+
+        # Prepare shift data
+        for day, date in enumerate(schedule_dates):
             for doctor_idx, assigned in enumerate(solution[day]):
                 if assigned == 1:
                     shifts.append({
                         'doctor_id': doctor_idx + 1,
-                        'date': f"2025-01-{day + 1}"  # Example date
+                        'date': date
                     })
 
         # Save new shifts
