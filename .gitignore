@@ -11,7 +11,6 @@ migrations/versions/*.pyo
 
 repositories/__pyc*
 
-
 # Logs and debug
 *.log
 logs/
@@ -56,3 +55,51 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+
+# Node.js dependencies
+node_modules/
+package-lock.json
+package.json
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build artifacts
+dist/
+build/
+.cache/
+.vite/
+.vitepress/
+
+# Testing and coverage
+coverage/
+*.lcov
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Temporary and backup files
+*.tmp
+*.temp
+*.bak
+*.swp
+*.lock
+
+# Images and reports
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.bmp
+*.svg
+*.ico
+reports/
+
+# Miscellaneous
+*.bak
+*.orig
