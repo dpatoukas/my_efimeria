@@ -25,8 +25,18 @@ def create_app():
     # Configure application settings
     app.config['JWT_SECRET_KEY'] = 'supersecretkey'  # Replace with environment variable in production!
 
-    # Enable CORS
-    CORS(app)
+    CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}})  # Allow frontend origin
+
+    # Handle OPTIONS Preflight Requests
+    @app.before_request
+    def handle_options_request():
+        if request.method == 'OPTIONS':
+            headers = {
+                'Access-Control-Allow-Origin': 'http://localhost:5173',
+                'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+                'Access-Control-Allow-Headers': 'Authorization, Content-Type'
+            }
+            return ('', 200, headers)
 
     # Initialize JWT for authentication
     JWTManager(app)
