@@ -98,6 +98,16 @@ const DashboardPage = () => {
           </Button>
         </>
       )}
+
+      {/* Always show Manage Doctors button */}
+      <Button
+        variant="contained"
+        color="secondary"
+        onClick={() => navigate('/doctor-management')}
+        style={{ marginTop: '1rem', marginLeft: '1rem' }}
+      >
+        Manage Doctors
+      </Button>
     </Container>
   );
 };

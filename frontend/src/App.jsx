@@ -5,7 +5,9 @@ import DashboardPage from './pages/DashboardPage';
 import NotFoundPage from './pages/NotFoundPage';
 import ScheduleDetailPage from './pages/ScheduleDetailPage';
 import CreateSchedulePage from './pages/CreateSchedulePage';
+import ShiftResourcesPage from './pages/ShiftResourcesPage';
 import PrivateRoute from './components/PrivateRoute';
+import DoctorManagementPage from './pages/DoctorManagementPage.jsx';
 import { Container } from '@mui/material';
 
 /**
@@ -17,6 +19,7 @@ import { Container } from '@mui/material';
  * - "/dashboard" - Dashboard Page (Protected)
  * - "/schedule/:id" - Schedule Detail Page (Protected)
  * - "/create-schedule" - Create Schedule Page (Protected)
+ * - "/shift-resources" - Shift Resources Page (Protected)
  * - "*" - Not Found Page (Fallback)
  */
 const App = () => {
@@ -32,9 +35,10 @@ const App = () => {
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/schedule/:id" element={<ScheduleDetailPage />} />
             <Route path="/create-schedule" element={<CreateSchedulePage />} />
-            {/* <Route path="/shift-resources" element={<ShiftResourcesPage />} /> */}
-            <Route path="/schedule/:id" element={<ScheduleDetailPage />} />
+            <Route path="/shift-resources" element={<ShiftResourcesPage />} />
+            <Route path="/doctor-management" element={<DoctorManagementPage />} />
           </Route>
+
           {/* Catch-all Route for 404 Page */}
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
