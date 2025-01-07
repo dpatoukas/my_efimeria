@@ -1,35 +1,46 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import LoginPage from './pages/LoginPage';
+import DashboardPage from './pages/DashboardPage';
+import NotFoundPage from './pages/NotFoundPage';
+import ScheduleDetailPage from './pages/ScheduleDetailPage';
+import CreateSchedulePage from './pages/CreateSchedulePage';
+import PrivateRoute from './components/PrivateRoute';
+import { Container } from '@mui/material';
 
-function App() {
-  const [count, setCount] = useState(0)
-
+/**
+ * App Component - Entry point for the application.
+ * Sets up routing and layout for the Clinic Scheduling System.
+ *
+ * Routes:
+ * - "/" - Login Page (Public)
+ * - "/dashboard" - Dashboard Page (Protected)
+ * - "/schedule/:id" - Schedule Detail Page (Protected)
+ * - "/create-schedule" - Create Schedule Page (Protected)
+ * - "*" - Not Found Page (Fallback)
+ */
+const App = () => {
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <Router>
+      <Container>
+        <Routes>
+          {/* Public Route: Login Page */}
+          <Route path="/" element={<LoginPage />} />
 
-export default App
+          {/* Protected Routes */}
+          <Route element={<PrivateRoute />}>
+            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/schedule/:id" element={<ScheduleDetailPage />} />
+            <Route path="/create-schedule" element={<CreateSchedulePage />} />
+            {/* <Route path="/shift-resources" element={<ShiftResourcesPage />} /> */}
+            <Route path="/schedule/:id" element={<ScheduleDetailPage />} />
+          </Route>
+          {/* Catch-all Route for 404 Page */}
+          <Route path="*" element={<NotFoundPage />} />
+        </Routes>
+      </Container>
+    </Router>
+  );
+};
+
+export default App;
