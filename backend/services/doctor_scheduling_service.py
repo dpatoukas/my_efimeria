@@ -6,7 +6,7 @@ class DoctorSchedulingProblem:
     Evaluates constraint violations and computes a schedule cost.
     """
 
-    def __init__(self, hardConstraintPenalty, listOfDoctors, listOfDoctorPreferce, doctorshiftMax, doctorshiftMin, weekendPositionArray, doctorExperience):
+    def __init__(self, hardConstraintPenalty, listOfDoctors, listOfDoctorPreferce, doctorshiftMax, doctorshiftMin, weekendPositionArray, doctorExperience, num_days):
         """
         Initializes the DoctorSchedulingProblem with input data and constraints.
 
@@ -28,6 +28,7 @@ class DoctorSchedulingProblem:
         self.doctorshiftMin = doctorshiftMin
         self.doctorMaxShiftPerMonth = 7
         self.weeks = 4
+        self.num_days = num_days
 
         # Debugging information
         print("DoctorSchedulingProblem initialized with:")
@@ -43,7 +44,7 @@ class DoctorSchedulingProblem:
         """
         Returns the total number of shifts in the schedule.
         """
-        return len(self.doctors) * 30
+        return len(self.doctors) * self.num_days  # Pass num_days dynamically
 
     def getCost(self, schedule):
         """
@@ -85,7 +86,7 @@ class DoctorSchedulingProblem:
         Returns:
         - dict: Dictionary mapping each doctor to their assigned shifts.
         """
-        shiftsPerDoctor = 30
+        shiftsPerDoctor = self.num_days
         doctorShiftsDict = {}
         shiftIndex = 0
 
@@ -141,7 +142,7 @@ class DoctorSchedulingProblem:
         Returns:
         - int: Number of violations.
         """
-        totalPerShiftList = [0] * 30
+        totalPerShiftList = [0] * self.num_days
         violations = 0
 
         for doctor in doctorShiftDic:

@@ -131,9 +131,11 @@ class SolutionService:
         ShiftRepository.clear_shifts_for_schedule(session, schedule.id)
 
         # Get the correct year and month dynamically
+        _, num_days = calendar.monthrange(year, list(calendar.month_name).index(month))
+
         schedule_dates = [
             datetime(year, list(calendar.month_name).index(month), day + 1).strftime("%Y-%m-%d")
-            for day in range(len(solution))
+            for day in range(num_days)
         ]
 
         # Initialize shifts list before the loop

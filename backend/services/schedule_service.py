@@ -8,6 +8,7 @@ from database.models import Schedule  # Added import
 from flask import Response
 import csv
 from io import StringIO
+import calendar
 
 class ScheduleService:
     """
@@ -45,6 +46,7 @@ class ScheduleService:
             doctorExperience = [1] * len(doctorNames)
             doctorshiftMax = clinic_request['maxShifts']
             doctorshiftMin = clinic_request['minShifts']
+            _, num_days = calendar.monthrange(year, list(calendar.month_name).index(month))
 
             # Step 3: Create scheduling problem instance
             problem = DoctorSchedulingProblem(
@@ -54,7 +56,8 @@ class ScheduleService:
                 doctorshiftMax=doctorshiftMax,
                 doctorshiftMin=doctorshiftMin,
                 weekendPositionArray=weekendPositionArray,
-                doctorExperience=doctorExperience
+                doctorExperience=doctorExperience,
+                num_days=num_days
             )
 
             # Solve the problem using genetic algorithm
@@ -62,10 +65,8 @@ class ScheduleService:
             best_solution = solution_service.run_genetic_algorithm()
 
             # Reshape output to match schedule format
-            num_days = 30
             num_doctors = len(doctorNames)
             reshaped_solution = np.array(best_solution).reshape(num_days, num_doctors)
-
             # Step 4: Save schedule to the database
             schedule = ScheduleRepository.add_schedule(session, month, year)
             solution_service.save_solution_to_db(session, month, year, reshaped_solution)
