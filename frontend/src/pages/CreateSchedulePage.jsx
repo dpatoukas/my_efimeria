@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Container,
   Typography,
@@ -14,21 +14,22 @@ import {
   TableHead,
   TableRow,
   Paper,
-  TextField,
 } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const CreateSchedulePage = () => {
-  const navigate = useNavigate();
-
   const [month, setMonth] = useState('');
   const [year, setYear] = useState('');
-  const [doctorCount, setDoctorCount] = useState(1);
   const [days, setDays] = useState([]);
-  const [doctorNames, setDoctorNames] = useState([]);
-  const [dayOff, setDayOff] = useState({});
+  const [doctors, setDoctors] = useState([]);
 
-  const handleConfirm = () => {
+  useEffect(() => {
+    if (month && year) {
+      fetchDoctorsAndDays();
+    }
+  }, [month, year]);
+
+  const fetchDoctorsAndDays = async () => {
     const monthIndex = [
       'January', 'February', 'March', 'April', 'May', 'June',
       'July', 'August', 'September', 'October', 'November', 'December',
@@ -37,73 +38,73 @@ const CreateSchedulePage = () => {
     if (monthIndex !== -1) {
       const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
       setDays([...Array(daysInMonth).keys()].map(d => d + 1));
-      const initialNames = [...Array(doctorCount)].map((_, i) => `Doctor ${String.fromCharCode(65 + i)}`);
-      setDoctorNames(initialNames);
-      const initialDaysOff = {};
-      for (let i = 0; i < doctorCount; i++) initialDaysOff[i] = [];
-      setDayOff(initialDaysOff);
+
+      try {
+        const token = localStorage.getItem('token');
+        const response = await axios.get('http://localhost:5000/api/doctors/', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const updatedDoctors = response.data.map(doctor => ({
+          ...doctor,
+          days_off: doctor.days_off.split(',')
+        }));
+        setDoctors(updatedDoctors);
+      } catch (error) {
+        console.error('Failed to fetch doctors:', error);
+      }
     }
   };
 
-  const toggleDayOff = (index, day) => {
-    setDayOff(prev => {
-      const updatedDaysOff = { ...prev };
-      if (updatedDaysOff[index]?.includes(day)) {
-        updatedDaysOff[index] = updatedDaysOff[index].filter(d => d !== day);
-      } else {
-        updatedDaysOff[index] = [...(updatedDaysOff[index] || []), day];
-      }
-      return updatedDaysOff;
-    });
+  const toggleDayOff = (doctorId, day) => {
+    const monthIndex = [
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December',
+    ].indexOf(month);
+
+    const formattedDate = `${year}-${String(monthIndex + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    setDoctors(prevDoctors =>
+      prevDoctors.map(doctor => {
+        if (doctor.id === doctorId) {
+          const updatedDaysOff = doctor.days_off.includes(formattedDate)
+            ? doctor.days_off.filter(date => date !== formattedDate)
+            : [...doctor.days_off, formattedDate];
+          return { ...doctor, days_off: updatedDaysOff };
+        }
+        return doctor;
+      })
+    );
   };
 
-  const handleDoctorNameChange = (index, value) => {
-    const newDoctorNames = [...doctorNames];
-    newDoctorNames[index] = value.substring(0, 20);
-    setDoctorNames(newDoctorNames);
-  };
-
-  const handleSave = async () => {
+  const updateDatabase = async () => {
     try {
-      // Save doctors and preferences first
-      for (let i = 0; i < doctorNames.length; i++) {
-        const doctor = {
-          name: doctorNames[i],
-          days_off: dayOff[i].length > 0
-            ? dayOff[i].map(d => `${year}-${String(month).padStart(2, '0')}-${String(d).padStart(2, '0')}`).join(',')
-            : null,
-
-        };
-
-        const doctorResponse = await fetch('http://localhost:5000/api/doctors/', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
-          },
-          body: JSON.stringify(doctor),
+      const token = localStorage.getItem('token');
+      await Promise.all(doctors.map(async (doctor) => {
+        await axios.put(`http://localhost:5000/api/doctors/${doctor.id}`, {
+          days_off: doctor.days_off.join(',')
+        }, {
+          headers: { Authorization: `Bearer ${token}` },
         });
-
-        if (!doctorResponse.ok) throw new Error('Failed to save doctor preferences');
-      }
-
-      // Then save the schedule
-      const scheduleResponse = await fetch('http://localhost:5000/api/schedules/generate', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-        body: JSON.stringify({ month, year: parseInt(year) }),
-      });
-
-      if (!scheduleResponse.ok) throw new Error('Failed to create schedule');
-
-      alert('Doctors and schedule saved successfully!');
-      navigate('/dashboard');
+      }));
+      alert('Data updated successfully!');
     } catch (error) {
-      console.error(error);
-      alert('Failed to save doctors and schedule.');
+      console.error('Failed to update database:', error);
+      alert('Failed to update data.');
+    }
+  };
+
+  const generateSchedule = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      await axios.post('http://localhost:5000/api/schedules/generate', {
+        month,
+        year,
+      }, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      alert('Schedule generated successfully!');
+    } catch (error) {
+      console.error('Failed to generate schedule:', error);
+      alert('Failed to generate schedule.');
     }
   };
 
@@ -123,7 +124,7 @@ const CreateSchedulePage = () => {
           ))}
         </Select>
       </FormControl>
-      <FormControl fullWidth>
+      <FormControl fullWidth style={{ marginTop: '1rem' }}>
         <InputLabel>Year</InputLabel>
         <Select value={year} onChange={e => setYear(e.target.value)}>
           {[2024, 2025, 2026].map(y => (
@@ -131,44 +132,43 @@ const CreateSchedulePage = () => {
           ))}
         </Select>
       </FormControl>
-      <FormControl fullWidth>
-        <InputLabel>Number of Doctors</InputLabel>
-        <Select value={doctorCount} onChange={e => setDoctorCount(e.target.value)}>
-          {[...Array(10).keys()].map(n => (
-            <MenuItem key={n + 1} value={n + 1}>{n + 1}</MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-      <Button onClick={handleConfirm}>Confirm</Button>
 
       {days.length > 0 && (
-        <TableContainer component={Paper}>
-          <Table>
+        <TableContainer component={Paper} style={{ marginTop: '2rem', overflowX: 'auto' }}>
+          <Table size="small">
             <TableHead>
               <TableRow>
-                <TableCell>Doctor</TableCell>
-                {days.map(day => <TableCell key={day}>{day}</TableCell>)}
+                <TableCell style={{ minWidth: '150px' }}>Doctor</TableCell>
+                {days.map(day => <TableCell key={day} style={{ padding: '4px', minWidth: '30px' }}>{day}</TableCell>)}
               </TableRow>
             </TableHead>
             <TableBody>
-              {doctorNames.map((name, index) => (
-                <TableRow key={index}>
-                  <TableCell>
-                    <TextField value={name} onChange={e => handleDoctorNameChange(index, e.target.value)} />
-                  </TableCell>
-                  {days.map(day => (
-                    <TableCell key={day} onClick={() => toggleDayOff(index, day)}>
-                      {dayOff[index]?.includes(day) ? 'X' : ''}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))}
+              {doctors.map((doctor) => {
+                return (
+                  <TableRow key={doctor.id}>
+                    <TableCell style={{ padding: '4px', minWidth: '150px' }}>{doctor.name}</TableCell>
+                    {days.map(day => (
+                      <TableCell
+                        key={day}
+                        style={{ padding: '4px', minWidth: '30px', cursor: 'pointer' }}
+                        onClick={() => toggleDayOff(doctor.id, day)}
+                      >
+                        {doctor.days_off.includes(`${year}-${String([ 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December' ].indexOf(month) + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`) ? 'X' : ''}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
         </TableContainer>
       )}
-      <Button onClick={handleSave} color="primary" variant="contained" style={{ marginTop: '1rem' }}>
-        Confirm Schedule
+
+      <Button variant="contained" color="primary" onClick={updateDatabase} style={{ marginTop: '1rem' }}>
+        Update Database
+      </Button>
+      <Button variant="contained" color="secondary" onClick={generateSchedule} style={{ marginTop: '1rem', marginLeft: '1rem' }}>
+        Generate Schedule
       </Button>
     </Container>
   );
