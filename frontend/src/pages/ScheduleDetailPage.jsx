@@ -1,5 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Tooltip } from '@mui/material';
+import {
+  Container,
+  Typography,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Button,
+  Tooltip,
+} from '@mui/material';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
 
@@ -16,6 +28,7 @@ const ScheduleDetailPage = () => {
     const fetchScheduleDetails = async () => {
       try {
         const token = localStorage.getItem('token');
+
         // Fetch schedule
         const scheduleResponse = await axios.get(`http://localhost:5000/api/schedules/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
@@ -50,56 +63,43 @@ const ScheduleDetailPage = () => {
     fetchScheduleDetails();
   }, [id]);
 
+  // Function to check shift for a doctor and day
   const getShiftForDoctorAndDay = (doctorId, day) => {
     const date = `${schedule.year}-${String(new Date(Date.parse(`${schedule.month} 1, ${schedule.year}`)).getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
     const shift = shifts.find(s => s.doctor_id === doctorId && s.date === date);
     return shift ? (
       <Tooltip title={`Shift ID: ${shift.id}`} arrow>
-        <span>✔️</span>
+        <span style={{ color: 'green' }}>✔️</span>
       </Tooltip>
     ) : '';
   };
 
-  const exportToCSV = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get(`http://localhost:5000/api/schedules/export/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-        responseType: 'blob',
-      });
-
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', `schedule_${id}.csv`);
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-    } catch (error) {
-      console.error('Error exporting schedule:', error);
-    }
+  // Print functionality
+  const printSchedule = () => {
+    window.print(); // Triggers the browser's print dialog
   };
 
+  // Styles to fit the table and align properly
   const styles = {
     container: {
-      width: '100vw',
-      height: '100vh',
-      overflow: 'auto',
+      maxWidth: 'md',
     },
     tableContainer: {
-      maxWidth: '100%',
+      marginTop: '2rem',
       overflowX: 'auto',
+      maxWidth: '100%',
     },
-    table: {
-      width: 'auto',
-      borderCollapse: 'collapse',
+    tableCell: {
+      padding: '2px',
+      minWidth: '30px',
+      height: '30px',
+      textAlign: 'center',
+      fontSize: '0.8rem',
     },
     headerCell: {
-      minWidth: '40px',
-      textAlign: 'center',
-    },
-    bodyCell: {
-      minWidth: '40px',
+      padding: '2px',
+      minWidth: '30px',
+      fontWeight: 'bold',
       textAlign: 'center',
     },
   };
@@ -113,25 +113,32 @@ const ScheduleDetailPage = () => {
           <Typography variant="h2" gutterBottom>
             {schedule.month} {schedule.year}
           </Typography>
-          <Button onClick={exportToCSV} variant="contained" color="primary" style={{ marginBottom: '1rem' }}>
-            Export to CSV
+          <Button
+            onClick={printSchedule}
+            variant="contained"
+            color="primary"
+            style={{ marginBottom: '1rem' }}
+          >
+            Print Schedule
           </Button>
           <TableContainer component={Paper} style={styles.tableContainer}>
-            <Table style={styles.table} size="small">
+            <Table size="small">
               <TableHead>
                 <TableRow>
                   <TableCell style={styles.headerCell}>Doctor</TableCell>
                   {days.map(day => (
-                    <TableCell key={day} style={styles.headerCell}>{day}</TableCell>
+                    <TableCell key={day} style={styles.headerCell}>
+                      {day}
+                    </TableCell>
                   ))}
                 </TableRow>
               </TableHead>
               <TableBody>
                 {doctors.map(doctor => (
                   <TableRow key={doctor.id}>
-                    <TableCell style={styles.bodyCell}>{doctor.name}</TableCell>
+                    <TableCell style={styles.tableCell}>{doctor.name}</TableCell>
                     {days.map(day => (
-                      <TableCell key={day} style={styles.bodyCell}>
+                      <TableCell key={day} style={styles.tableCell}>
                         {getShiftForDoctorAndDay(doctor.id, day)}
                       </TableCell>
                     ))}

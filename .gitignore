@@ -62,6 +62,8 @@ package-lock.json
 package.json
 
 # Logs
+dev_utils/*.json
+dev_utils/*.png
 logs/
 *.log
 npm-debug.log*

@@ -1,0 +1,53 @@
+/* Table Container */
+.table-container {
+    margin-top: 2rem;
+    overflow-x: auto;
+    width: 100%;
+    max-width: 100%;
+    table-layout: fixed; /* Ensures cells take equal width */
+  }
+  
+  /* Table Cells */
+  .table-cell {
+    padding: 4px; /* Compact padding */
+    width: 1%; /* Makes cells evenly spaced */
+    height: 30px; /* Consistent height */
+    text-align: center;
+    font-size: 0.8rem; /* Smaller font size */
+    white-space: nowrap; /* Prevents wrapping */
+  }
+  
+  /* Doctor Name Cell */
+  .doctor-name {
+    padding: 4px;
+    width: 150px; /* Fixed width for doctor names */
+    font-weight: bold;
+    text-align: left;
+  }
+  
+  /* Highlighted Cell */
+  .cell-highlighted {
+    background-color: red;
+    cursor: pointer;
+  }
+  
+  /* Regular Cell */
+  .cell-regular {
+    background-color: white;
+    cursor: pointer;
+  }
+  
+  /* Scrollbar Tweaks */
+  .table-container::-webkit-scrollbar {
+    height: 6px;
+  }
+  
+  .table-container::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+  }
+  
+  .table-container::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
+  

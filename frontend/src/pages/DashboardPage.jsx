@@ -76,6 +76,28 @@ const DashboardPage = () => {
     }
   };
 
+  // Finalize Schedule
+  const handleFinalizeSchedule = async (id) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.put(`http://localhost:5000/api/schedules/${id}`,
+        { status: 'Finalized' },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      // Update the schedule status in the UI
+      setSchedules((prevSchedules) =>
+        prevSchedules.map((schedule) =>
+          schedule.id === id ? { ...schedule, status: 'Finalized' } : schedule
+        )
+      );
+
+      console.log(`Schedule ID ${id} finalized successfully.`);
+    } catch (error) {
+      console.error(`Error finalizing schedule ID ${id}:`, error.response?.data || error.message);
+    }
+  };
+
   return (
     <Container>
       <Typography variant="h2" gutterBottom>
@@ -120,6 +142,16 @@ const DashboardPage = () => {
                 >
                   View
                 </Button>
+                {schedule.status === 'Draft' && (
+                  <Button
+                    variant="contained"
+                    color="success"
+                    onClick={() => handleFinalizeSchedule(schedule.id)}
+                    style={{ marginRight: '0.5rem' }}
+                  >
+                    Finalize
+                  </Button>
+                )}
                 <Button
                   variant="contained"
                   color="secondary"
