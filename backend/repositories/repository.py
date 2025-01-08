@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 from repositories.dao import DoctorDAO, ScheduleDAO, ShiftDAO
 from database.models import Doctor, Schedule, Shift
+from repositories.dao import ScheduleDAO, ShiftDAO
 
 # Doctor Repository - Business Rules
 class DoctorRepository:
@@ -143,7 +144,40 @@ class ScheduleRepository:
         schedule.status = "Finalized"
         session.commit()
         return schedule
+    
+    @staticmethod
+    def delete_schedule(session: Session, schedule_id: int):
+        """
+        Deletes a schedule and associated shifts using DAO layer.
 
+        Args:
+            session (Session): Database session.
+            schedule_id (int): ID of the schedule to delete.
+
+        Returns:
+            bool: True if deletion is successful, False if not found.
+
+        Raises:
+            Exception: If an error occurs during deletion.
+        """
+        try:
+            # Check if the schedule exists
+            schedule = ScheduleDAO.get_schedule_by_id(session, schedule_id)
+            if not schedule:
+                raise ValueError("Schedule not found.")
+
+            # Delete associated shifts using ShiftDAO
+            shifts = ShiftDAO.get_shifts_by_schedule(session, schedule_id)
+            for shift in shifts:
+                ShiftDAO.delete_shift(session, shift.id)  # Reuse ShiftDAO delete method
+
+            # Delete the schedule using ScheduleDAO
+            return ScheduleDAO.delete_schedule(session, schedule_id)
+
+        except Exception as e:
+            session.rollback()  # Ensure rollback on failure
+            raise e
+    
 # Shift Repository - Business Rules
 class ShiftRepository:
     @staticmethod

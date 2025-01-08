@@ -9,6 +9,7 @@ from flask import Response
 import csv
 from io import StringIO
 import calendar
+from repositories.repository import ScheduleRepository  # Import Repository
 
 class ScheduleService:
     """
@@ -206,3 +207,37 @@ class ScheduleService:
         except Exception as e:
             logging.error(f"Error exporting schedule as CSV: {str(e)}")
             raise
+    
+    @staticmethod
+    def delete_schedule(session, schedule_id):
+        """
+        Deletes a schedule and its associated shifts using the repository layer.
+
+        Args:
+            session: Database session.
+            schedule_id (int): ID of the schedule to delete.
+
+        Returns:
+            bool: True if deletion is successful, False if not found.
+
+        Raises:
+            ValueError: If schedule is not found.
+            Exception: Logs and raises any other error during deletion.
+        """
+        try:
+            # Delegate the deletion process to the repository layer
+            result = ScheduleRepository.delete_schedule(session, schedule_id)
+
+            if not result:  # Schedule not found
+                raise ValueError(f"Schedule with ID {schedule_id} not found.")
+
+            logging.info(f"Schedule ID {schedule_id} deleted successfully.")
+            return True
+
+        except ValueError as ve:
+            logging.warning(str(ve))
+            raise ve  # Rethrow specific error for better API handling
+
+        except Exception as e:
+            logging.error(f"Error deleting schedule ID {schedule_id}: {str(e)}")
+            raise e  # Rethrow any unexpected errors
