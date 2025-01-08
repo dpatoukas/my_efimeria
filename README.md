@@ -1,155 +1,147 @@
+# Efimeria - Doctor Scheduling System
 
-# Clinic Scheduling API
+## Table of Contents
+1. [Overview](#overview)  
+2. [Features](#features)  
+3. [Tech Stack](#tech-stack)  
+4. [Setup Instructions](#setup-instructions)  
+5. [Testing](#testing)  
+6. [API Documentation](#api-documentation)  
+7. [Deployment](#deployment)  
+8. [Screenshots](#screenshots)  
+9. [Future Enhancements](#future-enhancements)  
+10. [License](#license)
 
-The **Clinic Scheduling API** is a RESTful service designed to manage doctor schedules, shifts, and related operations for a clinic.
-It provides endpoints for authentication, doctor management, schedule generation, and shift assignments.
+---
+
+## Overview
+Efimeria is a **full-stack web application** designed to generate optimized monthly work schedules for a clinic. It allows admins to manage doctors, configure preferences, and ensure compliance with scheduling constraints. The system prioritizes fairness, reduces consecutive shifts, and offers flexibility through manual edits.
+
+---
 
 ## Features
+- **Authentication/Authorization**: Secure login with JWT tokens.  
+- **Schedule Management**: Generate schedules, track history, and edit results manually.  
+- **Shift Preferences**: Incorporates doctor preferences and adheres to constraints like maximum shifts and weekend limits.  
+- **Reporting & Export**: Export schedules as CSV files.  
+- **Frontend UI**: Built with Material-UI for a clean and responsive design.  
+- **Documentation**: API endpoints documented with Swagger.  
+- **Testing**: Unit tests and integration testing. **TODO: Add test cases**
 
-- **Authentication:** Secure login with JWT-based authentication.
-- **Doctor Management:** CRUD operations for managing doctor profiles.
-- **Schedule Generation:** Automated generation of doctor schedules for specified months.
-- **Shift Management:** Assignment and management of doctor shifts.
-- **API Documentation:** Interactive API documentation using Swagger UI.
+---
 
-## Getting Started
+## Tech Stack
+- **Backend**: Python (FastAPI), SQLAlchemy, Alembic  
+- **Frontend**: React, Vite, Material-UI  
+- **Database**: SQLite  
+- **Deployment**: Docker (Optional) or Local Server  
 
+---
+
+## Setup Instructions
 ### Prerequisites
+- Python 3.10+  
+- Node.js 18+ and npm  
+- Git  
+- Virtual Environment (optional but recommended)  
 
-Ensure you have the following installed on your system:
-
-- [Python 3.8+](https://www.python.org/downloads/)
-- [pip](https://pip.pypa.io/en/stable/installation/)
-- [Git](https://git-scm.com/downloads)
-
-### Installation
-
-1. **Clone the Repository:**
-
+### Backend Setup
+1. Clone the repository:
    ```bash
    git clone https://github.com/dpatoukas/my_efimeria.git
-   cd my_efimeria
+   cd my_efimeria/backend
    ```
 
-2. **Set Up a Virtual Environment:**
-
+2. Create and activate a virtual environment:
    ```bash
-   python -m venv venv
+   python -m venv env
+   source env/bin/activate # Linux/Mac
+   .\env\Scripts\activate  # Windows
    ```
 
-3. **Activate the Virtual Environment:**
-
-   - **Windows:**
-     ```bash
-     venv\Scripts\activate
-     ```
-
-   - **macOS and Linux:**
-     ```bash
-     source venv/bin/activate
-     ```
-
-4. **Install Dependencies:**
-
+3. Install dependencies:
    ```bash
    pip install -r requirements.txt
    ```
 
-### Configuration
-
-1. **Environment Variables:**
-
-   Create a `.env` file in the project root to store environment variables:
-
+4. Run database migrations:
    ```bash
-   touch .env
+   alembic upgrade head
    ```
 
-2. **Database Setup:**
-
-   The application uses SQLite for development. Ensure the database file is present or create a new one:
-
+5. Start the backend server:
    ```bash
-   # In your .env file
-   DATABASE_URL=sqlite:///clinic_schedule.db
+   uvicorn main:app --reload
    ```
 
-3. **JWT Secret Key:**
-
-   Set a secret key for JWT authentication in your `.env` file:
-
+### Frontend Setup
+1. Move to the frontend directory:
    ```bash
-   # In your .env file
-   JWT_SECRET_KEY=your_secret_key_here
+   cd ../frontend
    ```
 
-### Running the Application
-
-1. **Initialize the Database:**
-
+2. Install dependencies:
    ```bash
-   flask db init
-   flask db migrate -m "Initial migration."
-   flask db upgrade
+   npm install
    ```
 
-2. **Start the Development Server:**
-
+3. Start the frontend server:
    ```bash
-   python main.py
+   npm run dev
    ```
 
-   The API will be accessible at `http://localhost:5000/`.
+---
 
-### Accessing Swagger UI
+## Testing
+- **Backend Testing**:  
+  ```bash
+  pytest
+  ```
+- **API Testing**: Postman scripts are included in the `docs/postman_collection.json`. **TODO: Verify Postman collection availability**  
+- **Frontend Testing**:  
+  ```bash
+  npm test
+  ``` **TODO: Add frontend tests**
 
-Swagger UI provides interactive API documentation.
+---
 
-1. **Navigate to Swagger UI:**
+## API Documentation
+- **Swagger UI**: Visit `http://localhost:8000/docs` after starting the backend server.  
+- **Redoc UI**: Visit `http://localhost:8000/redoc`.  
 
-   Open your browser and go to `http://localhost:5000/api/docs`.
+---
 
-2. **Authorize with JWT:**
+## Deployment
+### Using Docker (Optional) **TODO: Verify Dockerfile setup**
+1. Build the Docker image:
+   ```bash
+   docker-compose up --build
+   ```
 
-   - **Obtain a Token:**
-     - Use the `/api/auth/login` endpoint to authenticate and receive a JWT token.
+2. Access the application at `http://localhost:3000`.  
 
-   - **Authorize in Swagger UI:**
-     - Click the "Authorize" button in Swagger UI.
-     - Enter the token in the format: `Bearer your_jwt_token_here`.
-     - Click "Authorize" to apply the token.
+### Manual Deployment
+Follow the backend and frontend setup steps provided earlier, then configure your server to host both parts.
 
-### Project Structure
+---
 
-```plaintext
-my_efimeria/
-├── api/
-│   ├── __init__.py
-│   ├── auth.py
-│   ├── doctors.py
-│   ├── schedules.py
-│   └── shifts.py
-├── models/
-│   ├── __init__.py
-│   ├── doctor.py
-│   ├── schedule.py
-│   └── shift.py
-├── tests/
-│   ├── __init__.py
-│   ├── test_auth.py
-│   ├── test_doctors.py
-│   ├── test_schedules.py
-│   └── test_shifts.py
-├── .env
-├── main.py
-├── requirements.txt
-└── README.md
-```
+## Screenshots **TODO: Add screenshots**
+1. **Dashboard View**  
+   _[Insert Image]_  
 
-### Contributing
+2. **Schedule Details**  
+   _[Insert Image]_  
 
-Contributions are welcome! Please fork the repository and create a pull request with your changes.
+---
 
-### License
+## Future Enhancements
+- **Role-based Access Control (RBAC)**. **TODO: Implement RBAC**  
+- **Drag-and-drop schedule editing**. **TODO: Implement drag-and-drop support**  
+- **Calendar View** for better visualization. **TODO: Add calendar view**  
+- **Email Notifications** for schedule updates. **TODO: Implement email notifications**  
 
-This project is licensed under the MIT License. See the `LICENSE` file for details.
+---
+
+## License
+This project is licensed under the MIT License.  
+
