@@ -48,6 +48,25 @@ class ScheduleDAO:
     @staticmethod
     def get_schedule_by_id(session: Session, schedule_id: int):
         return session.query(Schedule).filter(Schedule.id == schedule_id).first()
+    
+    @staticmethod
+    def delete_schedule(session: Session, schedule_id: int):
+        """
+        Deletes a schedule by its ID.
+
+        Args:
+            session (Session): Database session.
+            schedule_id (int): ID of the schedule.
+
+        Returns:
+            bool: True if deleted, False if not found.
+        """
+        schedule = session.query(Schedule).filter(Schedule.id == schedule_id).first()
+        if schedule:
+            session.delete(schedule)
+            session.commit()
+            return True
+        return False
 
 
 # DAO for Shift Table
@@ -62,3 +81,22 @@ class ShiftDAO:
     @staticmethod
     def get_shifts_by_schedule(session: Session, schedule_id: int):
         return session.query(Shift).filter(Shift.schedule_id == schedule_id).all()
+    
+    @staticmethod
+    def delete_shift(session: Session, shift_id: int):
+        """
+        Deletes a shift by its ID.
+
+        Args:
+            session (Session): Database session.
+            shift_id (int): ID of the shift.
+
+        Returns:
+            bool: True if deleted, False if not found.
+        """
+        shift = session.query(Shift).filter(Shift.id == shift_id).first()
+        if shift:
+            session.delete(shift)
+            session.commit()
+            return True
+        return False 

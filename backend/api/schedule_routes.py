@@ -172,3 +172,42 @@ def export_schedule(id):
         return jsonify({'error': str(e)}), 500
     finally:
         session.close()
+
+@schedule_blueprint.route('/<int:id>', methods=['DELETE'])
+@jwt_required()
+@swag_from({
+    'tags': ['Schedules'],
+    'summary': 'Delete a schedule',
+    'description': 'Deletes a schedule by its ID.',
+    'parameters': [
+        {
+            'name': 'id',
+            'in': 'path',
+            'required': True,
+            'type': 'integer',
+            'description': 'ID of the schedule to delete'
+        }
+    ],
+    'responses': {
+        200: {'description': 'Schedule deleted successfully'},
+        404: {'description': 'Schedule not found'},
+        500: {'description': 'Internal server error'}
+    }
+})
+def delete_schedule(id):
+    session = Session()
+    try:
+        # Use the service method to delete the schedule
+        result = ScheduleService.delete_schedule(session, id)
+        if result:
+            logging.info(f"Deleted schedule ID {id}.")
+            return jsonify({'message': 'Schedule deleted successfully'}), 200
+        else:
+            logging.warning(f"Schedule ID {id} not found.")
+            return jsonify({'error': 'Schedule not found'}), 404
+    except Exception as e:
+        logging.error(f"Error deleting schedule: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+    finally:
+        session.close()
+

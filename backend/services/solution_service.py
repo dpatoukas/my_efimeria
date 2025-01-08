@@ -7,6 +7,7 @@ from datetime import datetime
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+import json
 
 from services.genetic_algorithm import eaSimpleWithElitism
 from repositories.repository import ShiftRepository, ScheduleRepository
@@ -109,7 +110,7 @@ class SolutionService:
         
         return best
 
-    def save_solution_to_db(self, session, month, year, solution):
+    def save_solution_to_db(self, session, month, year, solution, doctor_preferences):
         """
         Saves the generated solution to the database using the repository layer.
 
@@ -118,6 +119,7 @@ class SolutionService:
         - month (str): The month for the schedule.
         - year (int): The year for the schedule.
         - solution (list): The generated solution to save.
+        - doctor_preferences (list): Preferences of doctors as 0 for day off and 1 for available.
         """
         from repositories.repository import ScheduleRepository, ShiftRepository
 
@@ -138,7 +140,7 @@ class SolutionService:
             for day in range(num_days)
         ]
 
-        # Initialize shifts list before the loop
+        # Initialize shifts list
         shifts = []
 
         # Prepare shift data
@@ -153,3 +155,27 @@ class SolutionService:
         # Save new shifts
         ShiftRepository.save_shifts(session, schedule.id, shifts)
         print("Solution saved successfully!")
+
+        # Save debugging data to JSON files
+        output_dir = '../dev_utils'
+        os.makedirs(output_dir, exist_ok=True)
+
+        # Save shifts data
+        shifts_file_path = os.path.join(output_dir, 'shifts.json')
+        with open(shifts_file_path, 'w') as shifts_file:
+            json.dump(shifts, shifts_file, indent=4)
+        print(f"Shifts data saved at: {shifts_file_path}")
+
+        # Save doctor preferences as structured data
+        preferences_data = {}
+        for doctor_idx, preferences in enumerate(doctor_preferences):
+            doctor_id = doctor_idx + 1
+            preferences_data[doctor_id] = {
+                'day_off_requested': [schedule_dates[day] for day, pref in enumerate(preferences) if pref == 0],
+                'day_available': [schedule_dates[day] for day, pref in enumerate(preferences) if pref == 1]
+            }
+
+        preferences_file_path = os.path.join(output_dir, 'days_off.json')
+        with open(preferences_file_path, 'w') as pref_file:
+            json.dump(preferences_data, pref_file, indent=4)
+        print(f"Doctor preferences saved at: {preferences_file_path}")

@@ -7,6 +7,11 @@ import {
   ListItem,
   ListItemText,
   CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
 } from '@mui/material';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -14,6 +19,8 @@ import { useNavigate } from 'react-router-dom';
 const DashboardPage = () => {
   const [schedules, setSchedules] = useState([]); // Store fetched schedules
   const [loading, setLoading] = useState(true);  // Loading state
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false); // Dialog state
+  const [scheduleToDelete, setScheduleToDelete] = useState(null);  // Schedule ID to delete
   const navigate = useNavigate();               // Navigation hook
 
   // Fetch schedules from API
@@ -42,6 +49,31 @@ const DashboardPage = () => {
   // Navigate to Schedule Detail Page
   const handleScheduleClick = (id) => {
     navigate(`/schedule/${id}`);
+  };
+
+  // Open Delete Confirmation Dialog
+  const handleDeleteClick = (id) => {
+    setScheduleToDelete(id);
+    setDeleteDialogOpen(true);
+  };
+
+  // Confirm Delete Schedule
+  const handleConfirmDelete = async () => {
+    try {
+      const token = localStorage.getItem('token'); // Get JWT token
+      await axios.delete(`http://localhost:5000/api/schedules/${scheduleToDelete}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      // Update the schedule list after deletion
+      setSchedules((prevSchedules) => prevSchedules.filter(schedule => schedule.id !== scheduleToDelete));
+      console.log(`Schedule ID ${scheduleToDelete} deleted successfully.`);
+    } catch (error) {
+      console.error(`Error deleting schedule ID ${scheduleToDelete}:`, error.response?.data || error.message);
+    } finally {
+      setDeleteDialogOpen(false);
+      setScheduleToDelete(null);
+    }
   };
 
   return (
@@ -75,15 +107,26 @@ const DashboardPage = () => {
 
           <List>
             {schedules.map((schedule) => (
-              <ListItem
-                button={true}
-                key={schedule.id}
-                onClick={() => handleScheduleClick(schedule.id)}
-              >
+              <ListItem key={schedule.id}>
                 <ListItemText
                   primary={`${schedule.month} ${schedule.year}`}
                   secondary={`Status: ${schedule.status}`}
                 />
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={() => handleScheduleClick(schedule.id)}
+                  style={{ marginRight: '0.5rem' }}
+                >
+                  View
+                </Button>
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  onClick={() => handleDeleteClick(schedule.id)}
+                >
+                  Delete
+                </Button>
               </ListItem>
             ))}
           </List>
@@ -108,6 +151,27 @@ const DashboardPage = () => {
       >
         Manage Doctors
       </Button>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+      >
+        <DialogTitle>Confirm Deletion</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to delete this schedule? This action cannot be undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteDialogOpen(false)} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleConfirmDelete} color="secondary">
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 };
