@@ -29,9 +29,9 @@ const CreateSchedulePage = () => {
   const [doctors, setDoctors] = useState([]);
   const [loading, setLoading] = useState(false);
   const [alert, setAlert] = useState({ open: false, message: '', severity: 'success' });
+  const [isGenerating, setIsGenerating] = useState(false);
   const navigate = useNavigate();
 
-  // Global monthIndex for reuse
   const monthIndex = React.useMemo(() => [
     'January', 'February', 'March', 'April', 'May', 'June',
     'July', 'August', 'September', 'October', 'November', 'December',
@@ -99,8 +99,31 @@ const CreateSchedulePage = () => {
     }
   };
 
-  const generateSchedule = async () => {
+  const checkScheduleHistory = async () => {
     setLoading(true);
+    setIsGenerating(true);
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get('http://localhost:5000/api/schedules/history', {
+        params: { month, year },
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (response.data.length === 0) {
+        await generateSchedule();
+      } else {
+        setAlert({ open: true, message: 'Schedule already exists!', severity: 'info' });
+      }
+    } catch (error) {
+      console.error('Failed to check schedule history:', error);
+      setAlert({ open: true, message: 'Error checking schedule history.', severity: 'error' });
+    } finally {
+      setLoading(false);
+      setIsGenerating(false);
+    }
+  };
+
+  const generateSchedule = async () => {
     try {
       const token = localStorage.getItem('token');
       await axios.post('http://localhost:5000/api/schedules/generate', {
@@ -110,18 +133,16 @@ const CreateSchedulePage = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
       setAlert({ open: true, message: 'Schedule generated successfully!', severity: 'success' });
-      setTimeout(() => navigate('/dashboard'), 2000); // Redirect to dashboard after 2 seconds
+      setTimeout(() => navigate('/dashboard'), 2000);
     } catch (error) {
       console.error('Failed to generate schedule:', error);
       setAlert({ open: true, message: 'Failed to generate schedule.', severity: 'error' });
-    } finally {
-      setLoading(false);
     }
   };
 
   return (
     <Container maxWidth="md">
-      <Backdrop open={loading} style={{ zIndex: 1201 }}>
+      <Backdrop open={loading || isGenerating} style={{ zIndex: 1201 }}>
         <CircularProgress color="inherit" />
       </Backdrop>
 
@@ -156,39 +177,41 @@ const CreateSchedulePage = () => {
       </FormControl>
 
       {days.length > 0 && (
-        <TableContainer component={Paper} style={{ marginTop: '2rem', maxWidth: '100%' }}>
-          <Table size="small">
-            <TableHead>
-              <TableRow>
-                <TableCell style={{ minWidth: '100px' }}>Doctor</TableCell>
-                {days.map(day => <TableCell key={day} style={{ padding: '2px', minWidth: '20px' }}>{day}</TableCell>)}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {doctors.map((doctor) => (
-                <TableRow key={doctor.id}>
-                  <TableCell style={{ padding: '2px', minWidth: '100px' }}>{doctor.name}</TableCell>
-                  {days.map(day => (
-                    <TableCell
-                      key={day}
-                      onClick={() => toggleDayOff(doctor.id, day)}
-                      style={{ padding: '2px', cursor: 'pointer', backgroundColor: doctor.days_off.includes(`${year}-${String(monthIndex + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`) ? 'red' : 'white' }}>
-                      {doctor.days_off.includes(`${year}-${String(monthIndex + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`) ? 'X' : ''}
-                    </TableCell>
-                  ))}
+        <>
+          <TableContainer component={Paper} style={{ marginTop: '2rem', maxWidth: '100%' }}>
+            <Table size="small">
+              <TableHead>
+                <TableRow>
+                  <TableCell style={{ minWidth: '100px' }}>Doctor</TableCell>
+                  {days.map(day => <TableCell key={day} style={{ padding: '2px', minWidth: '20px' }}>{day}</TableCell>)}
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      )}
+              </TableHead>
+              <TableBody>
+                {doctors.map((doctor) => (
+                  <TableRow key={doctor.id}>
+                    <TableCell style={{ padding: '2px', minWidth: '100px' }}>{doctor.name}</TableCell>
+                    {days.map(day => (
+                      <TableCell
+                        key={day}
+                        onClick={() => toggleDayOff(doctor.id, day)}
+                        style={{ padding: '2px', cursor: 'pointer', backgroundColor: doctor.days_off.includes(`${year}-${String(monthIndex + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`) ? 'red' : 'white' }}>
+                        {doctor.days_off.includes(`${year}-${String(monthIndex + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`) ? 'X' : ''}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
 
-      <Button variant="contained" color="primary" onClick={updateDatabase} style={{ marginTop: '1rem' }}>
-        Update Database
-      </Button>
-      <Button variant="contained" color="secondary" onClick={generateSchedule} style={{ marginTop: '1rem', marginLeft: '1rem' }}>
-        Generate Schedule
-      </Button>
+          <Button variant="contained" color="primary" onClick={updateDatabase} style={{ marginTop: '1rem' }}>
+            Update Database
+          </Button>
+          <Button variant="contained" color="secondary" onClick={checkScheduleHistory} style={{ marginTop: '1rem', marginLeft: '1rem' }}>
+            Generate Schedule
+          </Button>
+        </>
+      )}
     </Container>
   );
 };
