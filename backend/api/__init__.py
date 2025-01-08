@@ -12,7 +12,7 @@ from api.doctor_routes import doctor_blueprint
 from api.shift_routes import shift_blueprint
 
 # Initialize logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.WARNING, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # Application factory function
 def create_app():

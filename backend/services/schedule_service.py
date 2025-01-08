@@ -69,7 +69,7 @@ class ScheduleService:
             reshaped_solution = np.array(best_solution).reshape(num_days, num_doctors)
             # Step 4: Save schedule to the database
             schedule = ScheduleRepository.add_schedule(session, month, year)
-            solution_service.save_solution_to_db(session, month, year, reshaped_solution)
+            solution_service.save_solution_to_db(session, month, year, reshaped_solution,doctorPreference)
             logging.info(f"Schedule generated and saved for {month} {year}.")
             return {"message": f"Schedule for {month} {year} generated successfully!"}
         except Exception as e:
