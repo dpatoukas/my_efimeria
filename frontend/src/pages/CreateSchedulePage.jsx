@@ -14,14 +14,28 @@ import {
   TableHead,
   TableRow,
   Paper,
+  CircularProgress,
+  Backdrop,
+  Snackbar,
+  Alert
 } from '@mui/material';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const CreateSchedulePage = () => {
   const [month, setMonth] = useState('');
   const [year, setYear] = useState('');
   const [days, setDays] = useState([]);
   const [doctors, setDoctors] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [alert, setAlert] = useState({ open: false, message: '', severity: 'success' });
+  const navigate = useNavigate();
+
+  // Global monthIndex for reuse
+  const monthIndex = React.useMemo(() => [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December',
+  ].indexOf(month), [month]);
 
   useEffect(() => {
     if (month && year) {
@@ -30,11 +44,6 @@ const CreateSchedulePage = () => {
   }, [month, year]);
 
   const fetchDoctorsAndDays = async () => {
-    const monthIndex = [
-      'January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December',
-    ].indexOf(month);
-
     if (monthIndex !== -1) {
       const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
       setDays([...Array(daysInMonth).keys()].map(d => d + 1));
@@ -56,11 +65,6 @@ const CreateSchedulePage = () => {
   };
 
   const toggleDayOff = (doctorId, day) => {
-    const monthIndex = [
-      'January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December',
-    ].indexOf(month);
-
     const formattedDate = `${year}-${String(monthIndex + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
     setDoctors(prevDoctors =>
       prevDoctors.map(doctor => {
@@ -76,6 +80,7 @@ const CreateSchedulePage = () => {
   };
 
   const updateDatabase = async () => {
+    setLoading(true);
     try {
       const token = localStorage.getItem('token');
       await Promise.all(doctors.map(async (doctor) => {
@@ -85,14 +90,17 @@ const CreateSchedulePage = () => {
           headers: { Authorization: `Bearer ${token}` },
         });
       }));
-      alert('Data updated successfully!');
+      setAlert({ open: true, message: 'Data updated successfully!', severity: 'success' });
     } catch (error) {
       console.error('Failed to update database:', error);
-      alert('Failed to update data.');
+      setAlert({ open: true, message: 'Failed to update data.', severity: 'error' });
+    } finally {
+      setLoading(false);
     }
   };
 
   const generateSchedule = async () => {
+    setLoading(true);
     try {
       const token = localStorage.getItem('token');
       await axios.post('http://localhost:5000/api/schedules/generate', {
@@ -101,18 +109,32 @@ const CreateSchedulePage = () => {
       }, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      alert('Schedule generated successfully!');
+      setAlert({ open: true, message: 'Schedule generated successfully!', severity: 'success' });
+      setTimeout(() => navigate('/dashboard'), 2000); // Redirect to dashboard after 2 seconds
     } catch (error) {
       console.error('Failed to generate schedule:', error);
-      alert('Failed to generate schedule.');
+      setAlert({ open: true, message: 'Failed to generate schedule.', severity: 'error' });
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <Container>
+    <Container maxWidth="md">
+      <Backdrop open={loading} style={{ zIndex: 1201 }}>
+        <CircularProgress color="inherit" />
+      </Backdrop>
+
+      <Snackbar open={alert.open} autoHideDuration={6000} onClose={() => setAlert({ ...alert, open: false })}>
+        <Alert severity={alert.severity} onClose={() => setAlert({ ...alert, open: false })}>
+          {alert.message}
+        </Alert>
+      </Snackbar>
+
       <Typography variant="h2" gutterBottom>
         Create Schedule
       </Typography>
+
       <FormControl fullWidth>
         <InputLabel>Month</InputLabel>
         <Select value={month} onChange={e => setMonth(e.target.value)}>
@@ -134,31 +156,28 @@ const CreateSchedulePage = () => {
       </FormControl>
 
       {days.length > 0 && (
-        <TableContainer component={Paper} style={{ marginTop: '2rem', overflowX: 'auto' }}>
+        <TableContainer component={Paper} style={{ marginTop: '2rem', maxWidth: '100%' }}>
           <Table size="small">
             <TableHead>
               <TableRow>
-                <TableCell style={{ minWidth: '150px' }}>Doctor</TableCell>
-                {days.map(day => <TableCell key={day} style={{ padding: '4px', minWidth: '30px' }}>{day}</TableCell>)}
+                <TableCell style={{ minWidth: '100px' }}>Doctor</TableCell>
+                {days.map(day => <TableCell key={day} style={{ padding: '2px', minWidth: '20px' }}>{day}</TableCell>)}
               </TableRow>
             </TableHead>
             <TableBody>
-              {doctors.map((doctor) => {
-                return (
-                  <TableRow key={doctor.id}>
-                    <TableCell style={{ padding: '4px', minWidth: '150px' }}>{doctor.name}</TableCell>
-                    {days.map(day => (
-                      <TableCell
-                        key={day}
-                        style={{ padding: '4px', minWidth: '30px', cursor: 'pointer' }}
-                        onClick={() => toggleDayOff(doctor.id, day)}
-                      >
-                        {doctor.days_off.includes(`${year}-${String([ 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December' ].indexOf(month) + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`) ? 'X' : ''}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                );
-              })}
+              {doctors.map((doctor) => (
+                <TableRow key={doctor.id}>
+                  <TableCell style={{ padding: '2px', minWidth: '100px' }}>{doctor.name}</TableCell>
+                  {days.map(day => (
+                    <TableCell
+                      key={day}
+                      onClick={() => toggleDayOff(doctor.id, day)}
+                      style={{ padding: '2px', cursor: 'pointer', backgroundColor: doctor.days_off.includes(`${year}-${String(monthIndex + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`) ? 'red' : 'white' }}>
+                      {doctor.days_off.includes(`${year}-${String(monthIndex + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`) ? 'X' : ''}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))}
             </TableBody>
           </Table>
         </TableContainer>
