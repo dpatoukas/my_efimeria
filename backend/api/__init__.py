@@ -2,6 +2,7 @@ from flask import Flask, request
 from flask_jwt_extended import JWTManager
 from flask_cors import CORS
 import logging
+from config.logging_config import setup_logging
 from flasgger import Swagger
 from swagger_config import setup_swagger  # Import Swagger setup
 
@@ -19,6 +20,9 @@ def create_app():
     """
     Creates and configures the Flask application.
     """
+    #Initialize logging
+    setup_logging()
+
     # Initialize Flask App
     app = Flask(__name__)
 
