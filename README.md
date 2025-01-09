@@ -98,7 +98,7 @@ Alembic is used for managing schema changes in the database. Detailed instructio
    docker-compose up --build
    ```
 2. Access the application at [http://localhost:5173](http://localhost:5173/).
-3. Access the API Docs at [http://localhost:5173/](http://localhost:5000/api/docs)
+3. Access the API Docs at [http://localhost:5000/api/docs](http://localhost:5000/api/docs)
 4. Use the admin user with: {"username": "admin", "password": "password"}
 
 ### Manual Deployment
