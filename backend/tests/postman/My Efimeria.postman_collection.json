@@ -1,0 +1,530 @@
+{
+	"info": {
+		"_postman_id": "aaa20d5c-81b1-458d-84e8-6e7201e5c966",
+		"name": "My Efimeria",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "40802567"
+	},
+	"item": [
+		{
+			"name": "Login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Stores the access token in an environment or global variable\r",
+							"var accessToken = pm.response.json().access_token;\r",
+							"pm.environment.set(\"accessToken\", accessToken);\r",
+							"\r",
+							"\r",
+							"pm.collectionVariables.set(\"accessCollectionToken\", accessToken);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"username\": \"admin\", \"password\": \"password\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:5000/api/auth/login",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"auth",
+						"login"
+					]
+				},
+				"description": "### HTTP POST /api/auth/login\n\nThis endpoint is used to authenticate and obtain an access token for subsequent API requests.\n\n#### Request Body\n\n- Type: Raw (application/json)\n    \n- Description: JSON object containing the username and password for authentication.\n    \n\nExample:\n\n``` json\n{\n    \"username\": \"your_username\",\n    \"password\": \"your_password\"\n}\n\n ```\n\n#### Response\n\n- Status: 200\n    \n- Content-Type: application/json\n    \n- { \"access_token\": \"your_access_token\"}\n    \n\n### How to Use the Access Token\n\nYou can use the saved access token from the response in the Authorization header of another request. Set the header as follows:\n\n- Key: Authorization\n    \n- Value: Bearer your_access_token"
+			},
+			"response": []
+		},
+		{
+			"name": "Doctors: Get all",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{accessCollectionToken}}"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:5000/api/doctors/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"doctors",
+						""
+					]
+				},
+				"description": "Generated from cURL: curl --location --request GET 'http://localhost:5000/api/doctors/' \\\r\n--header 'Authorization: Bearer {{accessCollectionToken}}'"
+			},
+			"response": []
+		},
+		{
+			"name": "Create a New Doctor",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Parse the response JSON\r",
+							"let responseData = pm.response.json();\r",
+							"\r",
+							"// Save the doctor ID to a collection variable\r",
+							"pm.collectionVariables.set(\"doctor_id\", responseData.id);\r",
+							"\r",
+							"console.log(\"Doctor ID saved: \" + responseData.id);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{accessCollectionToken}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"Dr. Tssest\",\r\n    \"days_off\": \"2025-01-10,2025-01-11\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5000/api/doctors/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"doctors",
+						""
+					]
+				},
+				"description": "Generated from cURL: curl --location --request POST 'http://localhost:5000/api/doctors/' \\\r\n--header 'Authorization: Bearer {{accessCollectionToken}}' \\\r\n--header 'Content-Type: application/json' \\\r\n--data-raw '{\r\n    \"name\": \"Dr. Test\",\r\n    \"days_off\": \"2025-01-10,2025-01-11\"\r\n}'"
+			},
+			"response": []
+		},
+		{
+			"name": "Get Doctor by ID",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{accessCollectionToken}}"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:5000/api/doctors/15",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"doctors",
+						"15"
+					]
+				},
+				"description": "Generated from cURL: curl --location --request GET 'http://localhost:5000/api/doctors/1' \\\r\n--header 'Authorization: Bearer <YOUR_JWT_TOKEN>'"
+			},
+			"response": []
+		},
+		{
+			"name": "Update Doctor Information",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{accessCollectionToken}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"Dr. Jane Smith\",\r\n    \"days_off\": \"2025-01-05,2025-01-06\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5000/api/doctors/{{doctor_id}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"doctors",
+						"{{doctor_id}}"
+					]
+				},
+				"description": "Generated from cURL: curl --location --request PUT 'http://localhost:5000/api/doctors/1' \\\r\n--header 'Content-Type: application/json' \\\r\n--header 'Authorization: Bearer <YOUR_JWT_TOKEN>' \\\r\n--data-raw '{\r\n    \"name\": \"Dr. Jane Smith\",\r\n    \"days_off\": \"2025-01-05,2025-01-06\"\r\n}'"
+			},
+			"response": []
+		},
+		{
+			"name": "Generate Schedule for a Month",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Parse the response JSON (assuming it's an array)\r",
+							"let responseData = pm.response.json();\r",
+							"\r",
+							"// Check if the response contains at least one schedule\r",
+							"if (responseData.length > 0) {\r",
+							"    // Save the ID of the first schedule to a collection variable\r",
+							"    pm.collectionVariables.set(\"schedule_id\", responseData[0].id);\r",
+							"    console.log(\"Schedule ID saved: \" + responseData[0].id);\r",
+							"} else {\r",
+							"    console.log(\"No schedules found in the response.\");\r",
+							"}"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{accessCollectionToken}}"
+					}
+				],
+				"url": {
+					"raw": "http://127.0.0.1:5000/api/schedules/history?month=January&year=2025",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"schedules",
+						"history"
+					],
+					"query": [
+						{
+							"key": "month",
+							"value": "January"
+						},
+						{
+							"key": "year",
+							"value": "2025"
+						}
+					]
+				},
+				"description": "Generated from cURL: curl -X GET \"http://127.0.0.1:5000/api/schedules/history?month=September&year=2024\" \\\r\n-H \"Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTczNjEwMzI0NywianRpIjoiYWI4ZjRhMTItNTMxZC00ZGI5LWFjOTktMzFlYzAwMDJjZDkzIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFkbWluIiwibmJmIjoxNzM2MTAzMjQ3LCJjc3JmIjoiZjcwYWZjYjMtOTc1ZC00YzM3LWI2NjAtOGU2ZWYyNjk1MDEzIiwiZXhwIjoxNzM2MTA0MTQ3fQ.G_frMvxaZ7GK06SrESmYcZYdMZr3Wbl6Hn7Kc0ZtgnM\""
+			},
+			"response": []
+		},
+		{
+			"name": "Get the history of the schedule",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{accessCollectionToken}}"
+					}
+				],
+				"url": {
+					"raw": "http://127.0.0.1:5000/api/schedules/{{schedule_id}}",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"schedules",
+						"{{schedule_id}}"
+					]
+				},
+				"description": "Generated from cURL: curl -X GET http://127.0.0.1:5000/api/schedules/1 \\\r\n-H \"Authorization: Bearer $TOKEN\"\r\n"
+			},
+			"response": []
+		},
+		{
+			"name": "Update Schedule Details",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{accessCollectionToken}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"status\": \"Finalized\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5000/api/schedules/{{schedule_id}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"schedules",
+						"{{schedule_id}}"
+					]
+				},
+				"description": "Generated from cURL: curl --location --request PUT 'http://localhost:5000/api/schedules/{{schedule_id}}' \\\r\n--header 'Authorization: Bearer {{accessCollectionToken}}' \\\r\n--header 'Content-Type: application/json' \\\r\n--data-raw '{\r\n    \"status\": \"Finalized\"\r\n}'"
+			},
+			"response": []
+		},
+		{
+			"name": "Get Shifts by Schedule",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{accessCollectionToken}}"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:5000/api/shifts?schedule_id={{schedule_id}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"shifts"
+					],
+					"query": [
+						{
+							"key": "schedule_id",
+							"value": "{{schedule_id}}"
+						}
+					]
+				},
+				"description": "Generated from cURL: curl --location --request GET 'http://localhost:5000/api/shifts?schedule_id=1' \\\r\n--header 'Authorization: Bearer <YOUR_JWT_TOKEN>'"
+			},
+			"response": []
+		},
+		{
+			"name": "Create a New Shift",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{accessCollectionToken}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"schedule_id\": {{schedule_id}},\r\n    \"doctor_id\": {{doctor_id}},\r\n    \"date\": \"2025-01-15\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5000/api/shifts",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"shifts"
+					]
+				},
+				"description": "Generated from cURL: curl --location --request POST 'http://localhost:5000/api/shifts' \\\r\n--header 'Authorization: Bearer {{accessCollectionToken}}' \\\r\n--header 'Content-Type: application/json' \\\r\n--data-raw '{\r\n    \"schedule_id\": {{schedule_id}},\r\n    \"doctor_id\": {{doctor_id}},\r\n    \"date\": \"2025-01-15\"\r\n}'"
+			},
+			"response": []
+		},
+		{
+			"name": "Delete the Shift",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{accessCollectionToken}}"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:5000/api/shifts/{{shift_id}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"shifts",
+						"{{shift_id}}"
+					]
+				},
+				"description": "Generated from cURL: curl --location --request DELETE 'http://localhost:5000/api/shifts/{{shift_id}}' \\\r\n--header 'Authorization: Bearer {{accessCollectionToken}}'"
+			},
+			"response": []
+		},
+		{
+			"name": "Delete the Schedule",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{accessCollectionToken}}"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:5000/api/schedules/{{schedule_id}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"schedules",
+						"{{schedule_id}}"
+					]
+				},
+				"description": "Generated from cURL: curl --location --request DELETE 'http://localhost:5000/api/schedules/{{schedule_id}}' \\\r\n--header 'Authorization: Bearer {{accessCollectionToken}}'"
+			},
+			"response": []
+		},
+		{
+			"name": "Delete the Doctor",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{accessCollectionToken}}"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:5000/api/doctors/{{doctor_id}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"doctors",
+						"{{doctor_id}}"
+					]
+				},
+				"description": "Generated from cURL: curl --location --request DELETE 'http://localhost:5000/api/doctors/{{doctor_id}}' \\\r\n--header 'Authorization: Bearer {{accessCollectionToken}}'"
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "accessToken",
+			"value": "accessToken"
+		},
+		{
+			"key": "accessCollectionToken",
+			"value": ""
+		},
+		{
+			"key": "doctor_id",
+			"value": ""
+		},
+		{
+			"key": "schedule_id",
+			"value": ""
+		}
+	]
+}
