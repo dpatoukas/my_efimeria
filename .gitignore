@@ -39,7 +39,11 @@ __pycache__/
 *.un~
 
 # Documentation and ignore folder
+Documentation/
 ignore/
+
+#Development Helper Files
+dev_utils/*.json
 
 # Alembic
 alembic.ini

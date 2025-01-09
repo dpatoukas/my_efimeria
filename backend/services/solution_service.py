@@ -3,6 +3,9 @@ import random
 import os
 import calendar
 from datetime import datetime
+import logging
+# Ensure logging is configured
+from config.logging_config import setup_logging
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -20,6 +23,8 @@ P_MUTATION = 0.3
 MAX_GENERATIONS = 100
 HALL_OF_FAME_SIZE = 450
 RANDOM_SEED = 42
+
+setup_logging()
 
 class SolutionService:
     """
@@ -86,8 +91,8 @@ class SolutionService:
         )
 
         best = hof.items[0]
-        print("-- Best Individual = ", best)
-        print("-- Best Fitness = ", best.fitness.values[0])
+        logging.info("-- Best Individual = %s", best)
+        logging.info("-- Best Fitness = %s", best.fitness.values[0])
         self.problem.printScheduleInfo(best)
 
         # # Plot fitness trends
