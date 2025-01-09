@@ -22,7 +22,7 @@
 ### 5. Τεκμηρίωση
 - Τεκμηρίωση του REST API με Swagger (αν υπάρχει REST API).
 ## API Documentation
-The full API documentation is available [on SwaggerHub](https://app.swaggerhub.com/apis/PATOUKAS/clinic-scheduling_api/1.0.0).
+- The full API documentation is available [on SwaggerHub](https://app.swaggerhub.com/apis/PATOUKAS/clinic-scheduling_api/1.0.0).
 - Παροχή οδηγιών στο `README.md` για build και deploy της εφαρμογής.
 
 ### 6. Χρονοδιάγραμμα και Υποβολή
