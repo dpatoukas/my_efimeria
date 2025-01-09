@@ -39,7 +39,7 @@ Efimeria is a **full-stack web application** designed to generate optimized mont
 ---
 
 ## Connection to Requirements
-This project directly addresses the deliverables outlined in the [requirements.md](./requirements.md):
+This project directly addresses the deliverables outlined in the [requirements.md](Documentation/requirements.md):
 
 1. **Domain Model and Database**: Fully implemented with SQLAlchemy and managed using Alembic.  
    - Relevant File: `backend/models/` (for database models) and `backend/migrations/` (for Alembic migrations).
