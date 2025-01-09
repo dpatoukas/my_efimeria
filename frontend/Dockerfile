@@ -1,22 +1,22 @@
 # Frontend Dockerfile
 
 # Use an official Node.js runtime as a parent image
-FROM node:18
+FROM node:20
 
-# Set the working directory in the container
+# Set the working directory
 WORKDIR /app
 
-# Copy the package.json and package-lock.json
-COPY package.json package-lock.json ./
+# Copy package.json and package-lock.json
+COPY frontend/package.json frontend/package-lock.json ./
 
-# Install dependencies
-RUN npm install
+# Clean cache and install dependencies
+RUN npm cache clean --force && rm -rf node_modules && npm install
 
-# Copy the rest of the application code
-COPY . .
+# Copy the rest of the frontend code
+COPY frontend /app
 
-# Expose the development server port
-EXPOSE 3000
+# Expose port for the Vite development server
+EXPOSE 5173
 
-# Start the application and bind it to all network interfaces
-CMD ["npm", "start", "--", "--host", "0.0.0.0"]
+# Start the development server
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]

@@ -1,13 +1,21 @@
 services:
   backend:
     build:
-      context: ./  # Corrected to point to the current folder
-      dockerfile: ./Dockerfile
+      context: .  # Root directory as context
+      dockerfile: backend/Dockerfile
     env_file:
-      - /.env  # Ensure this points to the correct .env location
+      - ./backend/.env
     ports:
       - "5000:5000"
     volumes:
-      - .:/app
-      - ./data/clinic_schedule.db:/app/data/clinic_schedule.db
-      
+      - ./backend:/app
+      - ./backend/data/clinic_schedule.db:/app/data/clinic_schedule.db
+
+  frontend:
+    build:
+      context: .  # Root directory as context
+      dockerfile: frontend/Dockerfile
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
