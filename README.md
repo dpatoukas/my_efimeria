@@ -183,5 +183,13 @@ The development of Efimeria offered many valuable insights into both technical a
 These lessons will guide future projects, helping to create more polished and user-centric solutions.
 
 ## License
-This project is licensed under the MIT License.
-```
+## License
+
+Efimeria is licensed under the GNU General Public License v3.0.  
+You can redistribute it and/or modify it under the terms of the GPL.  
+
+For more details, see the [LICENSE](./LICENSE) file or visit the [GNU GPL v3](https://www.gnu.org/licenses/gpl-3.0.en.html) official page.
+
+![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)
+
+
