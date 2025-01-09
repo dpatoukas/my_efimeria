@@ -1,6 +1,6 @@
 # Database
-clinic_schedule.db
-*.db
+# clinic_schedule.db
+# *.db
 *.sqlite3
 *.sqlite
 *.db-journal
@@ -95,10 +95,8 @@ Thumbs.db
 *.lock
 
 # Images and reports
-*.png
 *.jpg
 *.jpeg
-*.gif
 *.bmp
 *.svg
 *.ico
