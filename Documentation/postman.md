@@ -7,6 +7,7 @@ The Postman collection for this project is located in the `postman` directory. I
 ### Use Case Simulated with the Postman Collection
 
 The use case being simulated is the **end-to-end management of doctors, schedules, and shifts** in a clinic. Below is a summary of the actions performed by the Postman collection:
+- The full API documentation is available [on SwaggerHub](https://app.swaggerhub.com/apis/PATOUKAS/clinic-scheduling_api/1.0.0).
 
 1. **Authentication**
    - The collection starts by simulating user authentication to retrieve a `JWT token`. This token is used to authorize all subsequent API requests.
