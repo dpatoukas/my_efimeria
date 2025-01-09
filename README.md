@@ -108,13 +108,17 @@ Alembic is used for managing schema changes in the database. Detailed instructio
 
 ## Screenshots
 1. **Dashboard View**  
-   _[Insert Image]_  
+![Dashboard](Documentation/images/Dashboard.png)
+
+
 
 2. **Schedule Details**  
-   _[Insert Image]_  
+![Create Schedule](Documentation/images/Create_schedule.png)
+![Schedule Details](Documentation/images/Schedule.png)
 
 ---
-
+## Demo
+![](Documentation/images/Animation.gif)
 
 ## Future Enhancements
 
