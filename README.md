@@ -31,10 +31,9 @@ Efimeria is a **full-stack web application** designed to generate optimized mont
 - **Authentication/Authorization**: Secure login with JWT tokens.
 - **Schedule Management**: Automated generation, history tracking, and manual editing of schedules.
 - **Shift Preferences**: Considers doctor preferences and constraints like weekend limits and maximum shifts.
-- **Reporting & Export**: Export schedules as CSV files for administrative use.
 - **Frontend UI**: Built with Material-UI for a modern, responsive interface.
 - **Documentation**: REST API documentation available via Swagger.
-- **Testing**: Comprehensive unit and integration testing.
+- **Testing**: Comprehensive unit and API testing.
 
 ---
 
@@ -56,12 +55,10 @@ This project directly addresses the deliverables outlined in the [requirements.m
      - `backend/tests/postman` (Postman collection for API testing).
 
 5. **Documentation**: API documentation via Swagger and deployment instructions in this README.  
-   - Relevant File: `backend/main.py` (Swagger integration) and `README.md` (deployment instructions).
+   - Relevant File:-[on SwaggerHub](https://app.swaggerhub.com/apis/PATOUKAS/clinic-scheduling_api/1.0.0).. and [Deployment](#deployment)
 
 6. **Submission Guidelines**: GitHub repository with a README and required documentation.  
-   - Relevant File: `README.md` `Motivation and Approach` `Documentation` and [Future Enhancements](#future-enhancements) . 
-
-Each directory or file directly supports the outlined requirements, ensuring that the project meets the submission guidelines comprehensively.
+   - Relevant File: `This One :D` [Motivation and Approach](Documentation/motivation_and_approach.md) [Documentation](Documentation) and [Future Enhancements](#future-enhancements) . 
 
 ---
 
@@ -84,10 +81,8 @@ Alembic is used for managing schema changes in the database. Detailed instructio
   pytest tests
   ```
 - **API Testing**: Postman collections simulate end-to-end workflows. See the [Postman Documentation](./postman.md).
-- **Frontend Testing**:
-  ```bash
-  npm test
-  ```
+- **Frontend Testing**: `@TODO`
+
 
 ---
 
@@ -105,7 +100,7 @@ Alembic is used for managing schema changes in the database. Detailed instructio
 2. Access the application at `http://localhost:3000`.
 
 ### Manual Deployment
-Follow the backend and frontend setup instructions 
+[Follow the backend and frontend setup instructions ](Documentation/backend_frontend_setup.md)  
 
 ---
 
@@ -184,5 +179,3 @@ These lessons will guide future projects, helping to create more polished and us
 ## License
 This project is licensed under the MIT License.
 ```
-
-You can copy and paste this directly into your `README.md` file. Let me know if you need further modifications!
