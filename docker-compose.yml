@@ -12,10 +12,12 @@ services:
       - ./backend/data/clinic_schedule.db:/app/data/clinic_schedule.db
 
   frontend:
-    build:
-      context: .  # Root directory as context
-      dockerfile: frontend/Dockerfile
-    ports:
-      - "5173:5173"
-    volumes:
-      - ./frontend:/app
+      build:
+        context: .
+        dockerfile: frontend/Dockerfile
+      ports:
+        - "5173:5173"
+      environment:
+        - NODE_ENV=development
+      stdin_open: true
+      tty: true

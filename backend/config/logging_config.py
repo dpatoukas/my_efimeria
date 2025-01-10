@@ -8,6 +8,7 @@ def setup_logging():
     """
     log_level = os.getenv('LOG_LEVEL', 'WARNING').upper()
     log_dir = os.getenv('LOG_DIR', 'logs')
+    logging.basicConfig(level=logging.WARNING)
 
     # Ensure log directory exists
     if not os.path.exists(log_dir):
