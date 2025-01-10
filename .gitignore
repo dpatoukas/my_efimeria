@@ -20,7 +20,6 @@ logs/
 .idea/
 
 # Virtual environment
-.env
 .env.*
 
 # Cache and compiled Python files
