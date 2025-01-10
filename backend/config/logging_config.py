@@ -8,7 +8,6 @@ def setup_logging():
     """
     log_level = os.getenv('LOG_LEVEL', 'WARNING').upper()
     log_dir = os.getenv('LOG_DIR', 'logs')
-    logging.basicConfig(level=logging.WARNING)
 
     # Ensure log directory exists
     if not os.path.exists(log_dir):
@@ -46,6 +45,12 @@ def setup_logging():
                 'filename': os.path.join(log_dir, 'error.log'),
                 'maxBytes': 10485760,
                 'backupCount': 3
+            },
+            'sqlalchemy_file': {
+                'class': 'logging.FileHandler',
+                'formatter': 'detailed',
+                'level': 'WARNING',
+                'filename': os.path.join(log_dir, 'sqlalchemy.log')
             }
         },
         'root': {
@@ -57,6 +62,20 @@ def setup_logging():
                 'level': log_level,
                 'handlers': ['console', 'file'],
                 'propagate': False
+            },
+            'sqlalchemy.engine': {  # SQLAlchemy engine logger
+                'level': 'WARNING',
+                'handlers': ['sqlalchemy_file'],
+                'propagate': False
+            },
+            'sqlalchemy.pool': {  # SQLAlchemy pool logger
+                'level': 'WARNING',
+                'handlers': ['sqlalchemy_file'],
+                'propagate': False
             }
         }
     })
+
+    # Suppress unnecessary SQLAlchemy logs globally
+    logging.getLogger('sqlalchemy.engine').setLevel(logging.ERROR)
+    logging.getLogger('sqlalchemy.pool').setLevel(logging.ERROR)

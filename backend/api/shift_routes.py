@@ -10,8 +10,8 @@ import logging
 shift_blueprint = Blueprint('shift', __name__)
 
 # Configure logging
-logging.basicConfig(level=logging.WARNING)
-
+logger = logging.getLogger('shift_routes')
+logger.setLevel(logging.ERROR)
 
 @shift_blueprint.route('', methods=['GET'])
 @jwt_required()
