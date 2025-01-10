@@ -6,7 +6,7 @@ def setup_logging():
     """
     Configures logging settings for the entire application.
     """
-    log_level = os.getenv('LOG_LEVEL', 'DEBUG').upper()
+    log_level = os.getenv('LOG_LEVEL', 'WARNING').upper()
     log_dir = os.getenv('LOG_DIR', 'logs')
 
     # Ensure log directory exists
