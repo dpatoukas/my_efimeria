@@ -92,14 +92,15 @@ Alembic is used for managing schema changes in the database. Detailed instructio
 ---
 
 ## Deployment
-### Using Docker (Optional)
-1. Build the Docker image:
+### Using Docker 
+1. Clone the repository
+2. Build the Docker image:
    ```bash
    docker-compose up --build
    ```
-2. Access the application at [http://localhost:5173](http://localhost:5173/).
-3. Access the API Docs at [http://localhost:5000/api/docs](http://localhost:5000/api/docs)
-4. Use the admin user with: {"username": "admin", "password": "password"}
+3. Access the application at [http://localhost:5173](http://localhost:5173/).
+4. Access the API Docs at [http://localhost:5000/api/docs](http://localhost:5000/api/docs)
+5. Use the admin user with: {"username": "admin", "password": "password"}
 
 ### Manual Deployment
 [Follow the backend and frontend setup instructions ](Documentation/backend_frontend_setup.md)  
