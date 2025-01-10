@@ -29,7 +29,7 @@ Efimeria is a **full-stack web application** designed to generate optimized mont
 
 ## Features
 - **Authentication/Authorization**: Secure login with JWT tokens.
-- **Schedule Management**: Automated generation, history tracking, and manual editing of schedules.
+- **Schedule Management**: Automated generation
 - **Shift Preferences**: Considers doctor preferences and constraints like weekend limits and maximum shifts.
 - **Frontend UI**: Built with Material-UI for a modern, responsive interface.
 - **Documentation**: REST API documentation available via Swagger.
